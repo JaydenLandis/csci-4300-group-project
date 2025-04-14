@@ -1,12 +1,13 @@
 const Login = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-3xl font-bold mb-4">Login Page</h1>
-      <form className="bg-white p-6 rounded shadow-md w-80">
+    <div className="flex flex-col items-center justify-content-center text-center h-100 bg-gray-100 p-5">
+      <h1 className="text-3xl font-bold mb-2">Please enter your Username and Password</h1>
+      <p className="text-3xl mb-3 pb-5">or register if you don't have an account</p>
+      <form className="bg-white p-3 mx-auto rounded shadow-md w-50 rounded border shadow-lg">
         <div className="mb-4">
           <label
             htmlFor="username"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-700 m-3"
           >
             Username
           </label>
@@ -19,7 +20,7 @@ const Login = () => {
         <div className="mb-4">
           <label
             htmlFor="password"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-700 margin-50 m-3"
           >
             Password
           </label>
@@ -31,10 +32,14 @@ const Login = () => {
         </div>
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+          className="btn btn-primary w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 shadow-sm p-4 mb-5 m-3"
         >
           Login
         </button>
+        <button
+        type="submit"
+        className="btn w-full bg-blue-500 text-black py-2 rounded hover:bg-blue-600 shadow p-4 mb-5 m-3"
+        > Register</button>
       </form>
     </div>
   );
