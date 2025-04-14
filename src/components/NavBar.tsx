@@ -10,7 +10,7 @@ const NavBar: React.FC = () => {
         className="navbar navbar-expand-md navbar-light bg-light p-3"
         aria-label="Fourth navbar example"
       >
-        <a className="navbar-brand" href="#">
+        <a className="navbar-brand" aria-current="page" href="/">
           AutoFlash
         </a>
         <button
