@@ -1,12 +1,13 @@
 "use client";
+
 //import Image from "next/image";
-import React, { useState } from 'react';
-import "./globals.css";
+import React, { useState } from "react";
+import "@/components/NewCard.css";
 
 type Card = {
   front: string;
   back: string;
-}
+};
 
 const QuestionAnswerForm: React.FC = () => {
   const [question, setQuestion] = useState("");
@@ -20,7 +21,7 @@ const QuestionAnswerForm: React.FC = () => {
     const newCard: Card = {
       front: question,
       back: answer,
-    }
+    };
 
     setCards((prevCards) => [...prevCards, newCard]);
     setQuestion("");
@@ -64,12 +65,19 @@ const QuestionAnswerForm: React.FC = () => {
       <ul className="qa-card-list">
         {cards.map((card, index) => (
           <li key={index} className="qa-card">
-            <p><strong>Q:</strong> {card.front} </p>
-            <p><strong>A:</strong> {card.back}</p>
-          <div style={{ textAlign: 'right', marginTop: '10px' }}>
-            <button onClick={() => handleDeleteCard(index)} className="qa-delete-button">
-              Delete
-            </button>
+            <p>
+              <strong>Q:</strong> {card.front}{" "}
+            </p>
+            <p>
+              <strong>A:</strong> {card.back}
+            </p>
+            <div style={{ textAlign: "right", marginTop: "10px" }}>
+              <button
+                onClick={() => handleDeleteCard(index)}
+                className="qa-delete-button"
+              >
+                Delete
+              </button>
             </div>
           </li>
         ))}
@@ -86,8 +94,12 @@ const QuestionAnswerForm: React.FC = () => {
           <ul className="qa-card-list">
             {confirmedCards.map((card, index) => (
               <li key={index} className="qa-card">
-                <p><strong>Q:</strong> {card.front}</p>
-                <p><strong>A:</strong> {card.back}</p>
+                <p>
+                  <strong>Q:</strong> {card.front}
+                </p>
+                <p>
+                  <strong>A:</strong> {card.back}
+                </p>
               </li>
             ))}
           </ul>
