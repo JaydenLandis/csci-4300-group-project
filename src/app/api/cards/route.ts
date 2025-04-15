@@ -1,17 +1,18 @@
 import connectMongoDB from "../../../../config/mongodb";
-import Item from "../../../models/itemSchema";
+import User from "../../../models/userSchema";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 
+// 501 error if user isn't unique 
 export async function POST(request: NextRequest) {
-  const { owner, title, description, url } = await request.json();
+  const {userName, password, subjects } = await request.json();
   await connectMongoDB();
-  await Item.create({ owner, title, description, url });
-  return NextResponse.json({ message: "Item added successfully" }, { status: 201 });
+  await User.create({userName, password, subjects})
+  return NextResponse.json({message: "User added succesfully"}, {status: 201})
 }
 
 export async function GET() {
     await connectMongoDB();
-    const items = await Item.find();
-    return NextResponse.json({ items });
+    const users = await User.find();
+    return NextResponse.json({ users });
   }

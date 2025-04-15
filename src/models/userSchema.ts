@@ -11,6 +11,7 @@ interface IFlashCard {
 interface ISubjects {
   name: string
   flashCards: IFlashCard[]
+  image_url: string
 }
 
 interface Iuser extends Document{
@@ -28,13 +29,39 @@ const flashCardSchema = new Schema<IFlashCard> ({
 const subjectSchema = new Schema<ISubjects> ({
   name: {type: String, required: true},
   flashCards: {type: [flashCardSchema], default: []},
+  image_url: {type: String, required: true}
 })
 
 const userSchema = new Schema<Iuser> ({
-  userName: {type: String, required: true},
+  userName: {type: String, required: true, unique: true},
   password: {type: String, required: true},
   subjects: {type: [subjectSchema], default: []}
 })
 
 const User: Model<Iuser> = mongoose.models.User || mongoose.model<Iuser>("User", userSchema);
 export default User;
+
+
+/* 
+Example:
+
+{
+  "userName": "Jayden",
+  "password": "jayden_is_the_best",
+  "subjects": [
+    {
+      "name": "History",
+      "flashCards": [
+        {
+          "question": "Who was the first president of the United States?",
+          "options": ["George Washington", "John Adams", "Thomas Jefferson"],
+          "answer": "George Washington"
+        }
+      ],
+      "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKyQLk2MtbGJNwxf9PORQjkUxeGyYBfDb1Bg&s"
+    }
+  ]
+}
+
+
+*/
