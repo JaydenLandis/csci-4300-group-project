@@ -1,9 +1,15 @@
 "use client";
 
 import "./NavBar.css";
-import React from "react";
+import React, { use } from "react";
+import { useState } from "react";
 
-const NavBar: React.FC = () => {
+interface NavBarProps {
+  userAuthenticated: boolean;
+  userAuthenticatedHandler: (value: void) => void;
+}
+// Define the NavBar component
+const NavBar = (props: NavBarProps) => {
   return (
     <div className="container-fluid sticky-top p-0 border-bottom">
       <nav
@@ -34,7 +40,7 @@ const NavBar: React.FC = () => {
             </li>
             <li className="nav-item mx-3">
               <a className="nav-link" href="/login">
-                Login/Sign Up
+                {props.userAuthenticated ? "Logout" : "Login/Signup"}
               </a>
             </li>
             <li className="nav-item dropdown">
@@ -65,14 +71,22 @@ const NavBar: React.FC = () => {
               </ul>
             </li>
           </ul>
-          <form role="search">
-            <input
-              className="form-control"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-            />
-          </form>
+          {!props.userAuthenticated && (
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => props.userAuthenticatedHandler()}
+            >
+              Login
+            </button>
+          )}
+          {props.userAuthenticated && (
+            <button type="button" className="btn btn-secondary">
+              <a className="dropdown-item" href="/my-cards">
+                My Cards
+              </a>
+            </button>
+          )}
         </div>
       </nav>
     </div>

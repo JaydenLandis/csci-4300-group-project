@@ -2,17 +2,14 @@
 
 import React, { useEffect } from "react";
 import Image from "next/image";
+import "./Splash.css";
 
 const Splash: React.FC = () => {
-  useEffect(() => {
-    import("bootstrap/dist/js/bootstrap.bundle.min.js");
-  }, []);
-
   return (
     <div className="container d-flex flex-column justify-content-center align-items-center min-vh-100 text-center">
-      <div className="mb-5">
+      <header className="mb-5">
         <h1 className="display-4 fw-bold">Welcome to AutoFlash!</h1>
-        <p className="lead ">
+        <p className="lead max-width-50 mx-auto">
           Auto Flash is a web application that can turn your notes into flash
           cards, helping you study more effectively. It uses machine learning
           algorithms to analyze your notes and create flashcards that are
@@ -25,7 +22,7 @@ const Splash: React.FC = () => {
         >
           Get Started
         </a>
-      </div>
+      </header>
 
       <div
         id="carouselExampleIndicators"
