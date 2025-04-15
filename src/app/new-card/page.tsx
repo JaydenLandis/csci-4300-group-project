@@ -34,8 +34,10 @@ const QuestionAnswerForm: React.FC = () => {
 
   const handleConfirmSet = () => {
     console.log("Confirmed card set:", cards);
-    console.log("Final card set confirmed:", cards);
-    alert("Card set confirmed!");
+    alert("Card set confirmed! (Check console for details)");
+
+    setConfirmedCards(cards); // Move to confirmed
+    setCards([]); // Clear current cards
   };
 
   return (

@@ -1,8 +1,14 @@
+import React from "react";
+
 const Login = () => {
   return (
     <div className="flex flex-col items-center justify-content-center text-center h-100 bg-gray-100 p-5">
-      <h1 className="text-3xl font-bold mb-2">Please enter your Username and Password</h1>
-      <p className="text-3xl mb-3 pb-5">or register if you don't have an account</p>
+      <h1 className="text-3xl font-bold mb-2">
+        Please enter your Username and Password
+      </h1>
+      <p className="text-3xl mb-3 pb-5">
+        or register if you don't have an account
+      </p>
       <form className="bg-white p-3 mx-auto rounded shadow-md w-50 rounded border shadow-lg">
         <div className="mb-4">
           <label
@@ -37,9 +43,12 @@ const Login = () => {
           Login
         </button>
         <button
-        type="submit"
-        className="btn w-full bg-blue-500 text-black py-2 rounded hover:bg-blue-600 shadow p-4 mb-5 m-3"
-        > Register</button>
+          type="submit"
+          className="btn w-full bg-blue-500 text-black py-2 rounded hover:bg-blue-600 shadow p-4 mb-5 m-3"
+        >
+          {" "}
+          Register
+        </button>
       </form>
     </div>
   );
