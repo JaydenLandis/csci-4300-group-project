@@ -1,40 +1,25 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
+import { flashcardSetSchema, IFlashcardSet } from "./flashcardSetSchema";
+import FlashcardSet from "./flashcardSetSchema";
 
 // Mongoose provides properties such as the _id in Document, we extend this
 
-interface IFlashCard {
-  question: string
-  options: {type:[string], default: []}
-  answer: string
+
+
+
+
+interface IUser extends Document {
+  username: string;
+  password: string;
+  flashcardSets: mongoose.Types.ObjectId[]; // reference
 }
 
-interface ISubjects {
-  name: string
-  flashCards: IFlashCard[]
-}
+const userSchema = new Schema<IUser>({
+  username: { type: String, required: true },
+  password: { type: String, required: true },
+  flashcardSets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'FlashcardSet' }],
+});
 
-interface Iuser extends Document{
-  userName: string
-  password: string
-  subjects: ISubjects[]
-}
 
-const flashCardSchema = new Schema<IFlashCard> ({
-  question: { type: String, required: true },
-  options: {type: [String], required: true},
-  answer: { type: String, required: true },
-})
-
-const subjectSchema = new Schema<ISubjects> ({
-  name: {type: String, required: true},
-  flashCards: {type: [flashCardSchema], default: []},
-})
-
-const userSchema = new Schema<Iuser> ({
-  userName: {type: String, required: true},
-  password: {type: String, required: true},
-  subjects: {type: [subjectSchema], default: []}
-})
-
-const User: Model<Iuser> = mongoose.models.User || mongoose.model<Iuser>("User", userSchema);
+const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>("User", userSchema);
 export default User;

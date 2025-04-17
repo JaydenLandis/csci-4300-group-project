@@ -1,5 +1,5 @@
 import connectMongoDB from "../../../../config/mongodb";
-import Item from "../../../models/itemSchema";
+import Item from "../../../models/userSchema";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 
