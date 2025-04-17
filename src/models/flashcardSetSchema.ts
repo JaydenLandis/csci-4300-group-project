@@ -10,11 +10,13 @@ const flashcardSchema = new Schema<IFlashcard>({
 export interface IFlashcardSet extends Document {
   flashcards: IFlashcard[];
   setName: string;
+  imgUrl?: string;
 }
 
 export const flashcardSetSchema = new Schema<IFlashcardSet>({
   flashcards: { type: [flashcardSchema], default: [] },
   setName: { type: String, required: true },
+  imgUrl: { type: String, required: false },
 });
 
 
