@@ -87,8 +87,8 @@ const NavBar = (props: NavBarProps) => {
           )}
           {props.userAuthenticated && (
             <button type="button" className="btn btn-secondary">
-              <a className="dropdown-item" href="/my-cards">
-                My Cards
+              <a className="dropdown-item" href="/cards">
+                Cards
               </a>
             </button>
           )}

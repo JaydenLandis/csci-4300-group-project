@@ -6,9 +6,9 @@ import { NextRequest } from "next/server";
 
 // 501 error if user isn't unique 
 export async function POST(request: NextRequest) {
-  const { flashcards, setName } = await request.json();
+  const { flashcards, setName, imgUrl } = await request.json();
   await connectMongoDB();
-  await FlashcardSet.create({ flashcards, setName });
+  await FlashcardSet.create({ flashcards, setName, imgUrl });
   return NextResponse.json({ message: "Item added successfully" }, { status: 201 });
 }
 

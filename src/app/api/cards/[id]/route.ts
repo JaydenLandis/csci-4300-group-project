@@ -10,9 +10,9 @@ interface RouteParams {
 
 export async function PUT(request:NextRequest, { params }:RouteParams ) {
   const { id } = await params;
-  const { flashcards: flashcards, setName: setName } = await request.json();
+  const { flashcards: flashcards, setName: setName, imgUrl: imgUrl } = await request.json();
   await connectMongoDB();
-  await FlashcardSet.findByIdAndUpdate(id, { flashcards, setName });
+  await FlashcardSet.findByIdAndUpdate(id, { flashcards, setName, imgUrl });
   return NextResponse.json({ message: "Flashcard Set updated" }, { status: 200 });
 }
 
