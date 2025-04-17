@@ -39,6 +39,11 @@ const NavBar = (props: NavBarProps) => {
               </a>
             </li>
             <li className="nav-item mx-3">
+              <a className="nav-link active" aria-current="page" href="/about">
+                About
+              </a>
+            </li>
+            <li className="nav-item mx-3">
               <a className="nav-link" href="/login">
                 {props.userAuthenticated ? "Logout" : "Login/Signup"}
               </a>
