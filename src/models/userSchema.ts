@@ -5,9 +5,6 @@ import FlashcardSet from "./flashcardSetSchema";
 // Mongoose provides properties such as the _id in Document, we extend this
 
 
-
-
-
 interface IUser extends Document {
   username: string;
   password: string;

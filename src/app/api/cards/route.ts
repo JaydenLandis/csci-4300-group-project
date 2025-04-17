@@ -1,8 +1,10 @@
 import connectMongoDB from "../../../../config/mongodb";
 import FlashcardSet from "../../../models/flashcardSetSchema";
+
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 
+// 501 error if user isn't unique 
 export async function POST(request: NextRequest) {
   const { flashcards, setName } = await request.json();
   await connectMongoDB();
