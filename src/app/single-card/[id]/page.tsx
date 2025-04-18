@@ -1,20 +1,26 @@
-import type { FC } from 'react';
+// src/app/single-card/[id]/page.tsx
+import SingleCardClient from "@/components/SingleCardClient";
+export const dynamic = "force-dynamic";
 
 interface SingleCardPageProps {
   params: { id: string };
 }
 
-const SingleCardPage: FC<SingleCardPageProps> = ({ params }) => {
-  const { id } = params;
+export default async function SingleCardPage({ params }: SingleCardPageProps) {
+  const { id } = await params;
+  const res = await fetch(`http://localhost:3000/api/cards/${id}`, {
+    method: "GET",
+    cache: "no-store",
+  });
 
-  // e.g. fetch(`/api/cards/${id}`) or use your data‑fetching of choice
+  if (!res.ok) throw new Error("Failed to fetch data");
+
+  const { flashcardSet } = await res.json();
+
   return (
-    <div>
-      <h1>Card Details</h1>
-      <p>Showing card with ID: <strong>{id}</strong></p>
-      {/* render the rest of your card here */}
-    </div>
+    <SingleCardClient
+      flashcards={flashcardSet.flashcards}
+      setName={flashcardSet.setName}
+    />
   );
-};
-
-export default SingleCardPage;
+}
