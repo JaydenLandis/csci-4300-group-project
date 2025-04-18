@@ -51,6 +51,9 @@ export async function POST(request: NextRequest) {
 Return ONLY a JSON array like:
 [{ "question": "…", "answer": "…" }]
 
+Be sure to only include the most important topics. 
+Act as a UGA student in your selection.
+
 Text:
 ${ocrTexts.join('\n\n')}
   `.trim();
