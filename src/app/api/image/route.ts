@@ -1,88 +1,96 @@
-import { NextResponse, NextRequest } from 'next/server';
-import { GoogleGenAI, createUserContent } from '@google/genai';
+import { NextRequest, NextResponse } from 'next/server';
+import {
+  GoogleGenAI,
+  createUserContent,
+  createPartFromUri,
+} from '@google/genai';
 
 export async function POST(request: NextRequest) {
-  const ai = new GoogleGenAI({ apiKey: process.env.GEN_AI_API_KEY! });
+ 
+  const apiKey = process.env.GEN_AI_API_KEY;
+  if (!apiKey) {
+    throw new Error('Missing GEN_AI_API_KEY');
+  }
+  const ai = new GoogleGenAI({ apiKey });
 
+  // Parse data
   const form = await request.formData();
   const setId = form.get('setId');
-  const images = form.getAll('images') as File[];
+  const imageFiles = form.getAll('images') as File[];
 
-  if (!setId || images.length === 0) {
+  if (typeof setId !== 'string' || imageFiles.length === 0) {
     return NextResponse.json(
       { error: 'Please include setId and at least one image.' },
       { status: 400 }
     );
   }
 
-  // OCR Images
-  async function fileToBase64(file: File) {
-    const buf = new Uint8Array(await file.arrayBuffer());
-    let str = '';
-    for (let i = 0; i < buf.length; i += 0x8000) {
-      str += String.fromCharCode(...buf.subarray(i, i + 0x8000));
-    }
-    return btoa(str);
+  // Step 1: Upload images and extract text
+  const ocrTexts: string[] = [];
+  for (const file of imageFiles) {
+    // Upload the file to Google GenAI
+    const uploadRes = await ai.files.upload({
+      file,
+      config: { mimeType: file.type },
+    });
+
+    // Extract text via the vision model
+    const visionRes = await ai.models.generateContent({
+      model: 'gemini-2.0-flash',
+      contents: createUserContent([
+        createPartFromUri(uploadRes.uri!, uploadRes.mimeType!),
+        'Extract all readable text from this image.',
+      ]),
+    });
+
+    ocrTexts.push(visionRes.text ?? '');
   }
 
-  const texts = await Promise.all(
-    images.map(async (file) => {
-      const base64 = await fileToBase64(file);
-      const contents = createUserContent([
-        { inlineData: { data: base64, mimeType: file.type } },
-        'Extract all readable text from this image.',
-      ]);
-      const visionRes = await ai.models.generateContent({
-        model: 'gemini-2.0-flash',
-        contents,
-      });
-      return visionRes.text;
-    })
-  );
-
-  // Generate flashcards
+  // — Step 2: Prompt for flashcards
   const schemaDef = `
 const flashcardSchema = new Schema<IFlashcard>({
   question: { type: String, required: true },
-  answer: { type: String, required: true },
+  answer:   { type: String, required: true },
 });
   `.trim();
 
   const flashPrompt = `
 Using the Mongoose schema below, generate flashcards ONLY for the most impactful concepts.
-Return ONLY a JSON array of objects matching this schema with "question" and "answer" fields.
+Return ONLY a JSON array matching the schema with "question" and "answer" fields.
 
 ${schemaDef}
 
 Text content:
-${texts.join('\n\n')}
+${ocrTexts.join('\n\n')}
   `.trim();
 
-  const flashContents = createUserContent([flashPrompt]);
+  // Step 3: Generate flashcards
   const flashRes = await ai.models.generateContent({
     model: 'gemini-2.0-flash',
-    contents: flashContents,
+    contents: createUserContent([flashPrompt]),
   });
 
-  // parsing:
-  let raw = (flashRes.text || "").trim();
-  const fenceRegex = /^```(?:json)?\s*([\s\S]*?)```$/i;
-  const match = raw.match(fenceRegex);
-  const jsonText = match ? match[1].trim() : raw;
+  // Step 4: Strip code fences & parse JSON
+  const raw = (flashRes.text || '').trim();
+  const jsonText = raw
+    .replace(/^```(?:json)?\s*/, '')
+    .replace(/```$/, '')
+    .trim();
 
   let flashcards;
   try {
     flashcards = JSON.parse(jsonText);
-  } catch (err) {
+  } catch {
     return NextResponse.json(
       {
         setId,
-        error: 'Failed to parse JSON after stripping fences',
-        output: raw,
+        error: 'Failed to parse JSON from AI response.',
+        raw,
       },
       { status: 502 }
     );
   }
 
+  // — Final response
   return NextResponse.json({ setId, flashcards });
 }
