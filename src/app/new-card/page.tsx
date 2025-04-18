@@ -13,6 +13,7 @@ type Card = {
 const QuestionAnswerForm: React.FC = () => {
   // State variables
   const [setName, setSetName] = useState("");
+  const [setUrl, setSetUrl] = useState("");
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [cards, setCards] = useState<Card[]>([]);
@@ -44,6 +45,7 @@ const QuestionAnswerForm: React.FC = () => {
     const flashcardSet = {
       setName: setName.trim(),
       flashcards: cards,
+      setUrl: setUrl.trim(),
     };
 
     try {
@@ -80,17 +82,32 @@ const QuestionAnswerForm: React.FC = () => {
           Add questions and answers to create your flashcards.
         </p>
         <hr />
-        <label htmlFor="setName" className="qa-label mr-3">
-          Set Name:
-        </label>
-        <input
-          name="setName"
-          type="text"
-          placeholder="Enter set name"
-          value={setName}
-          onChange={(e) => setSetName(e.target.value)}
-          className="qa-set-name mb-2"
-        />
+        <div>
+          <label htmlFor="setName" className="qa-label mr-3">
+            Set Name:
+          </label>
+          <input
+            name="setName"
+            type="text"
+            placeholder="Enter set name"
+            value={setName}
+            onChange={(e) => setSetName(e.target.value)}
+            className="qa-set-name mb-2"
+          />
+        </div>
+        <div>
+          <label htmlFor="setUrl" className="qa-label mr-3">
+            Cover Image URL:
+          </label>
+          <input
+            name="setUrl"
+            type="url"
+            placeholder="Enter cover image URL"
+            value={setUrl}
+            onChange={(e) => setSetUrl(e.target.value)}
+            className="qa-set-name mb-2"
+          />
+        </div>
 
         <input
           name="question"
