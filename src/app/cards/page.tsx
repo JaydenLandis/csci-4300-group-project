@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from 'next/navigation'
 
 interface DemoCard {
   _id: string;
@@ -14,6 +15,8 @@ interface DemoCard {
 export default function CardsPage() {
   const [demoCards, setDemoCards] = useState<DemoCard[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const router = useRouter()
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -89,10 +92,14 @@ export default function CardsPage() {
                   </div>
                 </Link>
               ) : (
+                <div>
                 <button
                   type="button"
                   onClick={() => {
-                    console.log("Flash me");
+                    console.log(
+                      "Flash me",
+                      router.push(`/single-card/${(card as DemoCard)._id}`)
+                    );
                   }}
                   className="btn btn-light w-100 h-100 p-0 border-0"
                   style={{ background: "none", border: "none", padding: 0 }}
@@ -121,6 +128,7 @@ export default function CardsPage() {
                     </div>
                   </div>
                 </button>
+                </div>
               )}
             </div>
           ))}
