@@ -1,74 +1,49 @@
-"use client";
-
+'use server'
 import React from "react";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { FormEvent } from "react";
+import Router from "next/router";
+import {signIn, signOut} from "../auth";
 
-interface User {
-  username: string;
-  password: string;
+export async function doLogOut() {
+  await signOut({redirectTo: "/"});
 }
 
+export async function doCredentialLogin(formData:FormData): Promise<any> {
+  const username = formData.get("username") as string;
+  const password = formData.get("password") as string;
+
+  try {
+    const response = await signIn("credentials", {
+     username,
+     password,
+     redirect: false,
+    });
+    return response;
+  } catch (e: any) {
+    throw e;
+  }
+}
+async function onSubmit(event: FormEvent<HTMLFormElement>):Promise<void> {
+  event.preventDefault();
+
+  try {
+    const formData = new FormData(event.currentTarget);
+    const response = await doCredentialLogin(formData);
+
+    if (response?.error) {
+      console.error(response.error);
+      setError(response.error.message || "An error occured");
+    } else{
+      Router.push("/");
+    }
+  } catch (e:any) {
+    console.error(e);
+    setError("Check your Credentials");
+  }
+}
+
+
 const Login = () => {
-  const router = useRouter();
-
-  // Define the form states
-  const [username, setUsername] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
-
-  // Handle form submission (retrieve user object)
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    try {
-      const res = await fetch(
-        `http://localhost:3000/api/users/username/${username}`,
-        {
-          method: "GET",
-          cache: "no-store",
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error("Failed to fetch data");
-      }
-      const { user } = await res.json();
-      if (user.password === password) {
-        console.log("Login successful");
-        // props.setLoggedInUser(user);
-        router.push("/cards");
-      } else {
-        console.log("Incorrect password");
-        setError("Incorrect password");
-      }
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message);
-    }
-  }
-
-  async function handleRegister(e: React.FormEvent) {
-    e.preventDefault();
-    try {
-      const res: any = await fetch(`http://localhost:3000/api/users`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to fetch data");
-      }
-      const newUser = await res.json();
-      // props.setLoggedInUser(newUser);
-      router.push("/cards");
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message);
-    }
-  }
 
   return (
     <div className="flex flex-col items-center justify-content-center text-center h-100 bg-gray-100 p-5">
