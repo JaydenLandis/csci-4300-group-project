@@ -5,8 +5,19 @@ import { NextRequest } from "next/server";
 import bcrypt from "bcryptjs";
 
 export async function POST(request: NextRequest) {
-  const { username, password} = await request.json();
+  const { username, password } = await request.json();
   await connectMongoDB();
+
+
+  // Check if the username already exists
+  const existingUser = await User.findOne({ username });
+  if (existingUser) {
+    return NextResponse.json(
+      { message: "Username already taken" },
+      { status: 409 } // Conflict
+    );
+  }
+
   const hashedPassword = await bcrypt.hash(password,5);
   const newUser = {
     username,
@@ -22,6 +33,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Item added successfully" }, { status: 201 });
   }
 }
+
 
 export async function GET() {
     await connectMongoDB();

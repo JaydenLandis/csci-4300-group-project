@@ -64,6 +64,9 @@ const Login = () => {
           <input
             type="text"
             id="username"
+            value={username}
+            placeholder="Enter your username"
+            onChange={(e) => setUsername(e.target.value)}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500"
           />
         </div>
@@ -75,20 +78,29 @@ const Login = () => {
             Password
           </label>
           <input
+            onChange={(e) => setPassword(e.target.value)}
+            value={password}
+            placeholder="Enter your password"
             type="password"
             id="password"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500"
           />
         </div>
         <button
-          type="submit"
+          type="button"
           className="btn btn-primary w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 shadow-sm p-4 mb-5 m-3"
+          onClick={(e) => {
+            handleLogin(e);
+          }}
         >
           Login
         </button>
         <button
-          type="submit"
+          type="button"
           className="btn w-full bg-blue-500 text-black py-2 rounded hover:bg-blue-600 shadow p-4 mb-5 m-3"
+          onClick={(e) => {
+            handleRegister(e);
+          }}
         >
           {" "}
           Register

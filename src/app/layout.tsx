@@ -16,18 +16,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   // State to manage user authentication status
   // This can be replaced with actual authentication logic
 
-  const [userAuthenticated, setUserAuthenticated] = useState(false);
-  const toggleUserAuthenticated = () => {
-    setUserAuthenticated(!userAuthenticated);
-  };
+  const [loggedInUser, setLoggedInUser] = useState(null);
+  function loggedInUserHandler(user: any) {
+    setLoggedInUser(user);
+  }
 
   return (
     <html lang="en">
       <head />
       <body>
         <NavBar
-          userAuthenticated={userAuthenticated}
-          userAuthenticatedHandler={toggleUserAuthenticated}
+          loggedInUser={loggedInUser}
+          setLoggedInUser={loggedInUserHandler}
         />
 
         {children}
