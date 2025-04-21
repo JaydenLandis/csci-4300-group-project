@@ -4,9 +4,14 @@ import "./NavBar.css";
 import React, { use } from "react";
 import { useState } from "react";
 
+interface User {
+  username: string;
+  password: string;
+}
+
 interface NavBarProps {
-  userAuthenticated: boolean;
-  userAuthenticatedHandler: (value: void) => void;
+  loggedInUser: User | null;
+  setLoggedInUser: (user: User) => void;
 }
 // Define the NavBar component
 const NavBar = (props: NavBarProps) => {
@@ -44,8 +49,8 @@ const NavBar = (props: NavBarProps) => {
               </a>
             </li>
             <li className="nav-item mx-3">
-              <a className="nav-link" href="/login">
-                {props.userAuthenticated ? "Logout" : "Login/Signup"}
+              <a className="nav-link active" aria-current="page" href="/login">
+                Login / Register
               </a>
             </li>
             <li className="nav-item dropdown">
@@ -75,23 +80,18 @@ const NavBar = (props: NavBarProps) => {
                 </li>
               </ul>
             </li>
+            {props.loggedInUser && (
+              <li className="nav-item mx-3">
+                <a
+                  className="nav-link active"
+                  aria-current="page"
+                  href="/login"
+                >
+                  Flashcards
+                </a>
+              </li>
+            )}
           </ul>
-          {!props.userAuthenticated && (
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={() => props.userAuthenticatedHandler()}
-            >
-              Login
-            </button>
-          )}
-          {props.userAuthenticated && (
-            <button type="button" className="btn btn-secondary">
-              <a className="dropdown-item" href="/cards">
-                Cards
-              </a>
-            </button>
-          )}
         </div>
       </nav>
     </div>

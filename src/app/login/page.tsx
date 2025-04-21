@@ -4,13 +4,9 @@ import React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-interface userProps {
+interface User {
   username: string;
   password: string;
-}
-
-interface LoginProps {
-  params: { username: string };
 }
 
 const Login = () => {
@@ -39,7 +35,7 @@ const Login = () => {
       const { user } = await res.json();
       if (user.password === password) {
         console.log("Login successful");
-        console.log(user);
+        // props.setLoggedInUser(user);
         router.push("/cards");
       } else {
         console.log("Incorrect password");
@@ -66,6 +62,7 @@ const Login = () => {
         throw new Error("Failed to fetch data");
       }
       const newUser = await res.json();
+      // props.setLoggedInUser(newUser);
       router.push("/cards");
     } catch (err: any) {
       console.error(err);
