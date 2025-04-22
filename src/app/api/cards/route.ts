@@ -14,6 +14,6 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
     await connectMongoDB();
-    const cards = await FlashcardSet.find();
+    const cards = await FlashcardSet.find().sort({ _id: -1 });
     return NextResponse.json({ cards }, { status: 200 });
   }
