@@ -1,12 +1,9 @@
-
-import { NextResponse } from 'next/server';
 import {
   GoogleGenAI,
   createUserContent,
   createPartFromUri,
 } from '@google/genai';
-import connectMongoDB from '../config/mongodb';
-import FlashcardSet from '../src/models/flashcardSetSchema';
+
 
 /**
  * Upload & extract text form images
@@ -17,12 +14,13 @@ export async function extractTextFromImages(
 ): Promise<string> {
   const ocrTexts: string[] = [];
 
+  // Upload each file to google gemini
   for (const file of imageFiles) {
     const uploadRes = await ai.files.upload({
       file,
       config: { mimeType: file.type },
     });
-
+    // Call Ai model to extract text from uploaded images
     const visionRes = await ai.models.generateContent({
       model: 'gemini-2.0-flash',
       contents: createUserContent([
@@ -31,72 +29,10 @@ export async function extractTextFromImages(
       ]),
     });
 
+    // save extracted text or empty string 
     ocrTexts.push(visionRes.text ?? '');
   }
 
+  // combine all texts into single string 
   return ocrTexts.join('\n');
-}
-
-/**
- * Prompt, generate flashcards, parse JSON, save to MongoDB.
- * Returns a NextResponse.
- */
-export async function handleFlashcards(
-  ai: GoogleGenAI,
-  setId: string,
-  combinedText: string
-): Promise<NextResponse> {
-  // system prompt
-  const prompt = `
-Return ONLY a JSON array like:
-[{ "question": "…", "answer": "…" }]
-
-Be sure to only include the most important topics.
-Act as a UGA student in your selection.
-
-Text:
-${combinedText}
-  `
-
-  // call AI
-  const flashRes = await ai.models.generateContent({
-    model: 'gemini-2.0-flash',
-    contents: createUserContent([prompt]),
-  });
-
-  // parse JSON
-  const raw = (flashRes.text || '');
-  const jsonText = raw.replace(/^```(?:json)?\s*/, '').replace(/```$/, '');
-  let flashcards: { question: string; answer: string }[];
-
-  try {
-    flashcards = JSON.parse(jsonText);
-  } catch {
-    return NextResponse.json(
-      { setId, error: 'Failed to parse JSON from AI response.', raw },
-      { status: 502 }
-    );
-  }
-
-  // save to Mongo
-  try {
-    await connectMongoDB();
-    const updated = await FlashcardSet.findByIdAndUpdate(
-      setId,
-      { $push: { flashcards: { $each: flashcards } } },
-      { new: true, runValidators: true }
-    );
-    if (!updated) {
-      return NextResponse.json(
-        { setId, error: 'Flashcard set not found.' },
-        { status: 404 }
-      );
-    }
-    return NextResponse.json({ setId, flashcards, saved: true });
-  } catch (err) {
-    return NextResponse.json(
-      { setId, error: 'Database error', details: (err as Error).message },
-      { status: 500 }
-    );
-  }
 }

@@ -1,8 +1,11 @@
-// src/app/api/flashcards/generate/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI, createUserContent } from '@google/genai';
 import { extractTextFromImages } from '../../../../services/flashcards';
 
+/**
+ * This endpoint accepts an image, extracts its text, 
+ * and generates flashcards based on the extracted content.
+ */
 export async function POST(request: NextRequest) {
   const apiKey = process.env.GEN_AI_API_KEY;
   if (!apiKey) {
@@ -13,7 +16,7 @@ export async function POST(request: NextRequest) {
   }
   const ai = new GoogleGenAI({ apiKey });
 
-  // parse image files
+  // parse image files and check for valid input
   const form = await request.formData();
   const imageFiles = form.getAll('images') as File[];
   if (imageFiles.length === 0) {
@@ -44,7 +47,7 @@ ${combinedText}
     contents: createUserContent([prompt]),
   });
 
-  // parse
+  // parse and fromat response 
   const raw = flashRes.text ?? '';
   const jsonText = raw
     .replace(/^```(?:json)?\s*/, '')

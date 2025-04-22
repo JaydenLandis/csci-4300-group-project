@@ -1,158 +1,186 @@
 "use client";
 
-import React, { useState, useRef, DragEvent } from "react";
-import "@/components/NewCard.css";
+import React, { useState, useRef, useCallback } from 'react';
+import '@/components/NewCard.css';
 
-type Card = {
-  question: string;
-  answer: string;
-};
+type Card = { question: string; answer: string };
+type UploadStatus = 'idle' | 'uploading' | 'success' | 'error';
 
+/*
+Component for creating a new flashcard set.
+
+It allows for image/text uplaod to generate flashcards
+*/
 const QuestionAnswerForm: React.FC = () => {
-  const [setName, setSetName] = useState("");
-  const [imgUrl, setImgUrl] = useState("");
-  const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState("");
+  const [setName, setSetName] = useState('');
+  const [coverImageUrl, setCoverImageUrl] = useState('');
+  const [question, setQuestion] = useState('');
+  const [answer, setAnswer] = useState('');
   const [cards, setCards] = useState<Card[]>([]);
-  const [confirmedCards, setConfirmedCards] = useState<Card[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
-  const [paragraphText, setParagraphText] = useState("");
+  const [paragraphText, setParagraphText] = useState('');
   const [dragActive, setDragActive] = useState(false);
-
-  const [uploadStatus, setUploadStatus] = useState<
-    "idle" | "uploading" | "success" | "error"
-  >("idle");
+  const [imageUploadStatus, setImageUploadStatus] = useState<UploadStatus>('idle');
+  const [textUploadStatus, setTextUploadStatus] = useState<UploadStatus>('idle');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFiles = (files: FileList | null) => {
-    if (files) {
-      setSelectedFiles(files);
-      setUploadStatus("idle");
-    }
-  };
-
-  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragActive(true);
-  };
-
-  const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragActive(false);
-  };
-
-  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragActive(false);
-    handleFiles(e.dataTransfer.files);
-  };
-
-  // Merge returned flashcards into `cards`
-  const handleImageUpload = async () => {
-    if (!selectedFiles || selectedFiles.length === 0) {
-      alert("Please select at least one image first.");
-      return;
-    }
-
-    setUploadStatus("uploading");
-    const formData = new FormData();
-    Array.from(selectedFiles).forEach((file) => {
-      formData.append("images", file);
-    });
-
-    try {
-      const res = await fetch("http://localhost:3000/api/image", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        throw new Error(`Upload failed: ${res.statusText}`);
-      }
-
-      const data = await res.json();
-      console.log("Image API response:", data);
-
-      if (Array.isArray(data.flashcards)) {
-        setCards((prev) => [...prev, ...data.flashcards]);
-      }
-
-      setUploadStatus("success");
-      setSelectedFiles(null);
-    } catch (err) {
-      console.error("Image upload error:", err);
-      setUploadStatus("error");
-    }
-  };
-
-  const handleConfirm = () => {
+  const addCard = useCallback(() => {
     if (!question.trim() || !answer.trim()) return;
-    setCards((prev) => [...prev, { question, answer }]);
-    setQuestion("");
-    setAnswer("");
-  };
+    setCards(prev => [
+      ...prev,
+      { question: question.trim(), answer: answer.trim() },
+    ]);
+    setQuestion('');
+    setAnswer('');
+  }, [question, answer]);
 
-  const handleDeleteCard = (i: number) => {
-    setCards((prev) => prev.filter((_, idx) => idx !== i));
-  };
+  const deleteCard = useCallback((index: number) => {
+    setCards(prev => prev.filter((_, i) => i !== index));
+  }, []);
 
-  const handleConfirmSet = async () => {
+
+  /*
+  */
+  const handleUpload = useCallback(
+    async ({
+      precondition,
+      preconditionMsg,
+      buildFormData,
+      url,
+      setStatus,
+      onSuccess,
+    }: {
+      precondition: boolean;
+      preconditionMsg: string;
+      buildFormData: () => FormData;
+      url: string;
+      setStatus: React.Dispatch<React.SetStateAction<UploadStatus>>;
+      onSuccess: (newCards: Card[]) => void;
+    }) => {
+      if (!precondition) {
+        alert(preconditionMsg);
+        return;
+      }
+      setStatus('uploading');
+      try {
+        const response = await fetch(url, { method: 'POST', body: buildFormData() });
+        if (!response.ok) throw new Error(response.statusText);
+        const data = await response.json();
+        if (Array.isArray(data.flashcards)) {
+          onSuccess(data.flashcards);
+        }
+        setStatus('success');
+      } catch (error) {
+        console.error(error);
+        setStatus('error');
+      }
+    },
+    []
+  );
+
+  // Handles the image uplaod process
+  const uploadImages = useCallback(() => {
+    handleUpload({
+      precondition: !!selectedFiles && selectedFiles.length > 0,
+      preconditionMsg: 'Please select at least one image first.',
+      buildFormData: () => {
+        const fd = new FormData();
+        Array.from(selectedFiles as FileList).forEach(file =>
+          fd.append('images', file)
+        );
+        return fd;
+      },
+      url: '/api/image',
+      setStatus: setImageUploadStatus,
+      onSuccess: newCards => {
+        setCards(prev => [...prev, ...newCards]);
+        setSelectedFiles(null);
+      },
+    });
+  }, [selectedFiles, handleUpload]);
+
+  // Handles the text upload process and ensures text is provided 
+  const uploadText = useCallback(() => {
+    handleUpload({
+      precondition: paragraphText.trim().length > 0,
+      preconditionMsg: 'Please enter some text first.',
+      buildFormData: () => {
+        const fd = new FormData();
+        fd.append('text', paragraphText.trim());
+        return fd;
+      },
+      url: '/api/text',
+      setStatus: setTextUploadStatus,
+      onSuccess: newCards => {
+        setCards(prev => [...prev, ...newCards]);
+        setParagraphText('');
+      },
+    });
+  }, [paragraphText, handleUpload]);
+
+  const saveSet = useCallback(async () => {
     if (!setName.trim() || cards.length === 0) {
-      alert("Please provide a set name and at least one card.");
+      alert('Please provide a set name and at least one card.');
       return;
     }
-
     const payload = {
       setName: setName.trim(),
-      imgUrl: imgUrl.trim(),
+      imgUrl: coverImageUrl.trim(),
       flashcards: cards,
     };
-
     try {
-      const res = await fetch("http://localhost:3000/api/cards", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/cards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-
-      if (!res.ok) {
-        const err = await res.text();
-        throw new Error(err || res.statusText);
-      }
-
-      alert("Flashcard set created successfully!");
-      setConfirmedCards(cards);
+      if (!response.ok) throw new Error(await response.text());
+      alert('Flashcard set created successfully!');
+      // reset all
+      setSetName('');
+      setCoverImageUrl('');
       setCards([]);
-      setSetName("");
-      setImgUrl("");
-      setParagraphText("");
       setSelectedFiles(null);
-      setUploadStatus("idle");
+      setParagraphText('');
+      setImageUploadStatus('idle');
+      setTextUploadStatus('idle');
     } catch (error) {
-      console.error("Failed to save:", error);
-      alert("Failed to save. Try again.");
+      console.error(error);
+      alert('Failed to save. Try again.');
+    }
+  }, [setName, coverImageUrl, cards]);
+
+  const getButtonText = (status: UploadStatus, defaultText: string) => {
+    switch (status) {
+      case 'uploading':
+        return 'Uploading...';
+      case 'success':
+        return 'Uploaded!';
+      case 'error':
+        return 'Retry Upload';
+      default:
+        return defaultText;
     }
   };
 
   return (
     <div className="qa-container">
-      <section className="qa-main">
+      <main className="qa-main">
         <h2>Create a New Flashcard Set</h2>
-        <p>Fill in the details and add cards below.</p>
 
         <div className="qa-input-group">
           <input
             type="text"
             placeholder="Set Name"
             value={setName}
-            onChange={(e) => setSetName(e.target.value)}
+            onChange={e => setSetName(e.target.value)}
           />
           <input
             type="url"
             placeholder="Cover Image URL"
-            value={imgUrl}
-            onChange={(e) => setImgUrl(e.target.value)}
+            value={coverImageUrl}
+            onChange={e => setCoverImageUrl(e.target.value)}
           />
         </div>
 
@@ -161,66 +189,64 @@ const QuestionAnswerForm: React.FC = () => {
             type="text"
             placeholder="Question"
             value={question}
-            onChange={(e) => setQuestion(e.target.value)}
+            onChange={e => setQuestion(e.target.value)}
           />
           <input
             type="text"
             placeholder="Answer"
             value={answer}
-            onChange={(e) => setAnswer(e.target.value)}
+            onChange={e => setAnswer(e.target.value)}
           />
-          <button
-            type="button"
-            className="qa-button-add"
-            onClick={handleConfirm}
-          >
+          <button className="qa-button-add" onClick={addCard}>
             Add
           </button>
         </div>
 
         {cards.length > 0 && (
-          <div className="qa-cards-list-container">
+          <section className="qa-cards-list-container">
             <h3>Current Cards</h3>
             <ul className="qa-cards-list">
-              {cards.map((c, i) => (
+              {cards.map((card, i) => (
                 <li key={i} className="qa-card-item">
                   <div>
-                    <p>
-                      <strong>Q:</strong> {c.question}
-                    </p>
-                    <p>
-                      <strong>A:</strong> {c.answer}
-                    </p>
+                    <p><strong>Q:</strong> {card.question}</p>
+                    <p><strong>A:</strong> {card.answer}</p>
                   </div>
                   <button
                     className="qa-delete-button"
-                    onClick={() => handleDeleteCard(i)}
+                    onClick={() => deleteCard(i)}
                   >
                     Delete
                   </button>
                 </li>
               ))}
             </ul>
-          </div>
+          </section>
         )}
 
-        <button className="qa-button-save" onClick={handleConfirmSet}>
+        <button className="qa-button-save" onClick={saveSet}>
           Save Flashcard Set
         </button>
-      </section>
+      </main>
 
       <aside className="qa-side-panel">
-        <div>
-          <h3>Files</h3>
+        <section>
+          <h3>Images</h3>
           <div
-            className={`file-dropzone${dragActive ? " active" : ""}`}
+            className={`file-dropzone${dragActive ? ' active' : ''}`}
+            role="button"
+            aria-label="Drag & drop images or click to select"
             onClick={() => fileInputRef.current?.click()}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
+            onDragOver={e => { e.preventDefault(); setDragActive(true); }}
+            onDragLeave={e => { e.preventDefault(); setDragActive(false); }}
+            onDrop={e => {
+              e.preventDefault();
+              setDragActive(false);
+              setSelectedFiles(e.dataTransfer.files);
+            }}
           >
             {selectedFiles && selectedFiles.length > 0 ? (
-              Array.from(selectedFiles).map((f) => <p key={f.name}>{f.name}</p>)
+              Array.from(selectedFiles).map(f => <p key={f.name}>{f.name}</p>)
             ) : (
               <p>Drag &amp; drop or click to upload</p>
             )}
@@ -228,35 +254,40 @@ const QuestionAnswerForm: React.FC = () => {
               ref={fileInputRef}
               type="file"
               multiple
-              onChange={(e) => handleFiles(e.target.files)}
-              style={{ display: "none" }}
+              onChange={e => setSelectedFiles(e.target.files)}
+              style={{ display: 'none' }}
             />
           </div>
           {selectedFiles && (
             <button
-              type="button"
               className="qa-button-save"
-              onClick={handleImageUpload}
-              disabled={uploadStatus === "uploading"}
+              onClick={uploadImages}
+              disabled={imageUploadStatus === 'uploading'}
             >
-              {uploadStatus === "idle" && "Upload Image"}
-              {uploadStatus === "uploading" && "Uploading..."}
-              {uploadStatus === "success" && "Uploaded!"}
-              {uploadStatus === "error" && "Retry Upload"}
+              {getButtonText(imageUploadStatus, 'Upload Image')}
             </button>
           )}
-        </div>
+        </section>
 
-        <div>
+        <section>
           <h3>Notes</h3>
           <textarea
             className="notes-textarea"
             placeholder="Additional description..."
             value={paragraphText}
-            onChange={(e) => setParagraphText(e.target.value)}
+            onChange={e => setParagraphText(e.target.value)}
             rows={6}
           />
-        </div>
+          {paragraphText && (
+            <button
+              className="qa-button-save"
+              onClick={uploadText}
+              disabled={textUploadStatus === 'uploading'}
+            >
+              {getButtonText(textUploadStatus, 'Upload Text')}
+            </button>
+          )}
+        </section>
       </aside>
     </div>
   );

@@ -109,9 +109,7 @@ export default function CardsPage() {
                     style={{ minHeight: "350px" }}
                   >
                     <Image
-                      src={
-                         "/assets/flashcards.jpg"
-                      }
+                      src={(card as DemoCard).imgUrl || "/assets/flashcards.jpg"}
                       alt={(card as DemoCard).setName}
                       width={400} // Adjust as needed
                       height={250}
