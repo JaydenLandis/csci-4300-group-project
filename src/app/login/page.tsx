@@ -1,113 +1,96 @@
-'use server'
-import React from "react";
-import { FormEvent } from "react";
-import Router from "next/router";
-import {signIn, signOut} from "../auth";
+"use client";
 
-export async function doLogOut() {
-  await signOut({redirectTo: "/"});
-}
+import Link from "next/link";
+import React, { useState, FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { doCredentialLogin } from "../actions";
 
-export async function doCredentialLogin(formData:FormData): Promise<any> {
-  const username = formData.get("username") as string;
-  const password = formData.get("password") as string;
+const LoginForm = () => {
+  const router = useRouter();
+  const [error, setError] = useState<string>("");
 
-  try {
-    const response = await signIn("credentials", {
-     username,
-     password,
-     redirect: false,
-    });
-    return response;
-  } catch (e: any) {
-    throw e;
-  }
-}
-async function onSubmit(event: FormEvent<HTMLFormElement>):Promise<void> {
-  event.preventDefault();
+  async function onSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
+    event.preventDefault();
 
-  try {
-    const formData = new FormData(event.currentTarget);
-    const response = await doCredentialLogin(formData);
+    try {
+      const formData = new FormData(event.currentTarget);
+      const response = await doCredentialLogin(formData);
 
-    if (response?.error) {
-      console.error(response.error);
-      setError(response.error.message || "An error occured");
-    } else{
-      Router.push("/");
+      if (response?.error) {
+        console.error(response.error);
+        setError(response.error.message || "An error occurred");
+      } else {
+        router.push("/");
+      }
+    } catch (e: any) {
+      console.error(e);
+      setError("Check your Credentials");
     }
-  } catch (e:any) {
-    console.error(e);
-    setError("Check your Credentials");
   }
-}
-
-
-const Login = () => {
 
   return (
-    <div className="flex flex-col items-center justify-content-center text-center h-100 bg-gray-100 p-5">
-      <h1 className="text-3xl font-bold mb-2">
-        Please enter your Username and Password
-      </h1>
-      <p className="text-3xl mb-3 pb-5">
-        or register if you don't have an account
-      </p>
-      <form className="bg-white p-3 mx-auto rounded shadow-md w-50 rounded border shadow-lg">
-        <div className="mb-4">
-          <label
-            htmlFor="username"
-            className="block text-sm font-medium text-gray-700 m-3"
+    <div className="flex justify-center items-center min-h-screen bg-gray-50">
+      <div className="w-full max-w-md bg-white border border-gray-200 rounded-lg shadow-md p-8">
+        <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
+
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={onSubmit} className="space-y-5">
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Email Address
+            </label>
+            <input
+              className="w-full border border-gray-300 px-4 py-3 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              type="email"
+              name="email"
+              id="email"
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Password
+            </label>
+            <input
+              className="w-full border border-gray-300 px-4 py-3 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              type="password"
+              name="password"
+              id="password"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-md font-semibold transition"
           >
-            Username
-          </label>
-          <input
-            type="text"
-            id="username"
-            value={username}
-            placeholder="Enter your username"
-            onChange={(e) => setUsername(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium text-gray-700 margin-50 m-3"
-          >
-            Password
-          </label>
-          <input
-            onChange={(e) => setPassword(e.target.value)}
-            value={password}
-            placeholder="Enter your password"
-            type="password"
-            id="password"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500"
-          />
-        </div>
-        <button
-          type="button"
-          className="btn btn-primary w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 shadow-sm p-4 mb-5 m-3"
-          onClick={(e) => {
-            handleLogin(e);
-          }}
-        >
-          Login
-        </button>
-        <button
-          type="button"
-          className="btn w-full bg-blue-500 text-black py-2 rounded hover:bg-blue-600 shadow p-4 mb-5 m-3"
-          onClick={(e) => {
-            handleRegister(e);
-          }}
-        >
-          {" "}
-          Register
-        </button>
-      </form>
+            Login
+          </button>
+        </form>
+
+        <p className="mt-6 text-sm text-center text-gray-600">
+          Don’t have an account?
+          <Link href="/register" className="text-blue-600 hover:underline ml-1">
+            Sign up
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };
 
-export default Login;
+export default LoginForm;

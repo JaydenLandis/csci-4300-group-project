@@ -17,6 +17,16 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.britannica.com',
+        pathname: '/**', // This allows all paths under the domain
+      },
+      {
+        protocol: 'https',
+        hostname: '**',
+        pathname: '**',
+      }
     ],
   },
 };

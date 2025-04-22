@@ -1,100 +1,163 @@
 "use client";
 
-import "./NavBar.css";
-import React, { use } from "react";
-import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { doLogout } from "../app/actions/index";
 
-interface User {
-  username: string;
-  password: string;
+interface Session {
+  user?: {
+    name?: string;
+    email?: string;
+    image?: string;
+  };
 }
 
-interface NavBarProps {
-  loggedInUser: User | null;
-  setLoggedInUser: (user: User) => void;
+interface NavbarProps {
+  session: Session | null;
 }
-// Define the NavBar component
-const NavBar = (props: NavBarProps) => {
+
+const NavBar = ({ session }: NavbarProps) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(!!session?.user);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setIsLoggedIn(!!session?.user);
+  }, [session]);
+
+  const handleLogout = async () => {
+    await doLogout();
+    setIsLoggedIn(false);
+  };
+
   return (
-    <div className="container-fluid sticky-top p-0 border-bottom">
-      <nav
-        className="navbar navbar-expand-md navbar-light bg-light p-3"
-        aria-label="Fourth navbar example"
-      >
-        <a className="navbar-brand" aria-current="page" href="/">
-          AutoFlash
-        </a>
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarsExample04"
-          aria-controls="navbarsExample04"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
+    <header className="w-full bg-white shadow-md sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+        {/* Logo + Brand */}
+        <Link href="/" className="flex items-center gap-2">
+          <span className="text-xl font-semibold text-gray-900">AutoFlash</span>
+        </Link>
 
-        <div className="collapse navbar-collapse" id="navbarsExample04">
-          <ul className="navbar-nav me-auto mb-2 mb-md-0">
-            <li className="nav-item mx-3">
-              <a className="nav-link active" aria-current="page" href="/">
-                Home
-              </a>
-            </li>
-            <li className="nav-item mx-3">
-              <a className="nav-link active" aria-current="page" href="/about">
-                About
-              </a>
-            </li>
-            <li className="nav-item mx-3">
-              <a className="nav-link active" aria-current="page" href="/login">
-                Login / Register
-              </a>
-            </li>
-            <li className="nav-item dropdown">
-              <a
-                className="nav-link dropdown-toggle"
-                href="#"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
+        {/* Desktop Menu */}
+        <nav className="hidden md:flex gap-6 items-center">
+          <Link href="/" className="text-gray-700 hover:text-black transition">
+            Home
+          </Link>
+          <Link
+            href="/about"
+            className="text-gray-700 hover:text-black transition"
+          >
+            About
+          </Link>
+
+          {isLoggedIn && session?.user ? (
+            <>
+              <Link
+                href="/cards"
+                className="text-gray-700 hover:text-black transition mr-10"
               >
-                Dropdown
-              </a>
-              <ul className="dropdown-menu">
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Action
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Another action
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Something else here
-                  </a>
-                </li>
-              </ul>
-            </li>
-            {props.loggedInUser && (
-              <li className="nav-item mx-3">
-                <a
-                  className="nav-link active"
-                  aria-current="page"
-                  href="/login"
+                Cards
+              </Link>
+              <div className="flex items-center gap-4">
+                <span className="text-gray-600">
+                  Welcome, {session.user.name || session.user.email}
+                </span>
+
+                <button
+                  onClick={handleLogout}
+                  className="bg-gray-300 hover:bg-gray-400 text-sm px-4 py-2 rounded-md transition"
                 >
-                  Flashcards
-                </a>
-              </li>
+                  Logout
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="text-sm bg-gray-300 rounded-md px-4 py-2">
+              <Link href="/login" className="hover:underline">
+                Login
+              </Link>
+              <span className="mx-1">/</span>
+              <Link href="/register" className="hover:underline">
+                Register
+              </Link>
+            </div>
+          )}
+        </nav>
+
+        {/* Mobile menu button */}
+        <button
+          className="md:hidden p-2 rounded-md hover:bg-gray-200"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle menu"
+        >
+          <svg
+            className="h-6 w-6 text-gray-700"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            {menuOpen ? (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            ) : (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             )}
-          </ul>
+          </svg>
+        </button>
+      </div>
+
+      {/* Mobile menu dropdown */}
+      {menuOpen && (
+        <div className="md:hidden px-4 pb-4 space-y-2 bg-white shadow">
+          <Link href="/" className="block text-gray-700 hover:text-black">
+            Home
+          </Link>
+          <Link href="/about" className="block text-gray-700 hover:text-black">
+            About
+          </Link>
+          {isLoggedIn && session?.user ? (
+            <div className="flex flex-col gap-2">
+              <span className="text-gray-600">
+                Welcome, {session.user.name || session.user.email}
+              </span>
+              <span className="text-gray-600">
+                <Link
+                  href="/cards"
+                  className="text-gray-700 hover:text-black transition mr-10"
+                >
+                  Cards
+                </Link>
+              </span>
+              <button
+                onClick={handleLogout}
+                className="bg-gray-300 hover:bg-gray-400 text-sm px-4 py-2 rounded-md transition w-fit"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <div className="text-sm bg-gray-300 rounded-md px-4 py-2 inline-block">
+              <Link href="/login" className="hover:underline">
+                Login
+              </Link>
+              <span className="mx-1">/</span>
+              <Link href="/register" className="hover:underline">
+                Register
+              </Link>
+            </div>
+          )}
         </div>
-      </nav>
-    </div>
+      )}
+    </header>
   );
 };
 

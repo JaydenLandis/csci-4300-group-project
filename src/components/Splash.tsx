@@ -1,108 +1,92 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import "./Splash.css";
+import Link from "next/link";
+
+const images = [
+  "/assets/flashcards.jpg",
+  "/assets/flashcards.jpg",
+  "/assets/flashcards.jpg",
+];
 
 const Splash: React.FC = () => {
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % images.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const goToSlide = (index: number) => setCurrent(index);
+  const prevSlide = () =>
+    setCurrent((prev) => (prev - 1 + images.length) % images.length);
+  const nextSlide = () => setCurrent((prev) => (prev + 1) % images.length);
+
   return (
-    <div className="container d-flex flex-column justify-content-center align-items-center min-vh-100 text-center">
-      <header className="mb-5">
-        <h1 className="display-4 fw-bold">Welcome to AutoFlash!</h1>
-        <p className="lead max-width-50 mx-auto">
+    <div className="flex flex-col items-center justify-center min-h-screen text-center px-4 bg-gray-50">
+      <header className="mb-10 max-w-3xl">
+        <h1 className="text-5xl font-extrabold mb-6 text-gray-900">
+          Welcome to AutoFlash!
+        </h1>
+        <p className="text-lg text-gray-700">
           Auto Flash is a web application that can turn your notes into flash
           cards, helping you study more effectively. It uses machine learning
-          algorithms to analyze your notes and create flashcards that are
-          tailored to your learning style. With Auto Flash, you can easily
-          create flashcards
+          algorithms to analyze your notes and create flashcards tailored to
+          your learning style.
         </p>
-        <a
+        <Link
           href="/login"
-          className="btn btn-lg btn-light fw-bold border-white bg-white mt-3"
+          className="inline-block mt-6 bg-blue-500 text-white font-semibold px-6 py-3 rounded-lg shadow hover:bg-blue-400 transition"
         >
           Get Started
-        </a>
+        </Link>
       </header>
 
-      <div
-        id="carouselExampleIndicators"
-        className="carousel slide w-100"
-        data-bs-ride="carousel"
-      >
-        <div className="carousel-indicators">
-          <button
-            type="button"
-            data-bs-target="#carouselExampleIndicators"
-            data-bs-slide-to="0"
-            className="active"
-            aria-current="true"
-            aria-label="Slide 1"
-          ></button>
-          <button
-            type="button"
-            data-bs-target="#carouselExampleIndicators"
-            data-bs-slide-to="1"
-            aria-label="Slide 2"
-          ></button>
-          <button
-            type="button"
-            data-bs-target="#carouselExampleIndicators"
-            data-bs-slide-to="2"
-            aria-label="Slide 3"
-          ></button>
-        </div>
-        <div className="carousel-inner rounded shadow">
-          <div className="carousel-item active">
-            <Image
-              src="/assets/flashcards.jpg"
-              className="d-block w-100"
-              alt="Slide 1"
-              width={1200}
-              height={600}
-            />
-          </div>
-          <div className="carousel-item">
-            <Image
-              src="/assets/flashcards.jpg"
-              className="d-block w-100"
-              alt="Slide 2"
-              width={1200}
-              height={600}
-            />
-          </div>
-          <div className="carousel-item">
-            <Image
-              src="/assets/flashcards.jpg"
-              className="d-block w-100"
-              alt="Slide 3"
-              width={1200}
-              height={600}
-            />
-          </div>
-        </div>
-        <button
-          className="carousel-control-prev"
-          type="button"
-          data-bs-target="#carouselExampleIndicators"
-          data-bs-slide="prev"
+      <div className="relative w-full max-w-4xl overflow-hidden rounded-xl shadow-lg">
+        <div
+          className="flex transition-transform duration-700 ease-in-out"
+          style={{ transform: `translateX(-${current * 100}%)` }}
         >
-          <span
-            className="carousel-control-prev-icon"
-            aria-hidden="true"
-          ></span>
-          <span className="visually-hidden">Previous</span>
+          {images.map((src, index) => (
+            <div key={index} className="min-w-full h-[300px] relative">
+              <Image
+                src={src}
+                alt={`Slide ${index + 1}`}
+                fill
+                className="object-cover"
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Carousel controls */}
+        <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex gap-2">
+          {images.map((_, index) => (
+            <button
+              key={index}
+              className={`w-3 h-3 rounded-full ${
+                current === index ? "bg-white" : "bg-gray-400"
+              } transition`}
+              onClick={() => goToSlide(index)}
+            />
+          ))}
+        </div>
+
+        {/* Navigation buttons */}
+        <button
+          onClick={prevSlide}
+          className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white bg-opacity-60 hover:bg-opacity-90 p-2 rounded-full shadow"
+        >
+          ◀
         </button>
         <button
-          className="carousel-control-next"
-          type="button"
-          data-bs-target="#carouselExampleIndicators"
-          data-bs-slide="next"
+          onClick={nextSlide}
+          className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white bg-opacity-60 hover:bg-opacity-90 p-2 rounded-full shadow"
         >
-          <span
-            className="carousel-control-next-icon"
-            aria-hidden="true"
-          ></span>
-          <span className="visually-hidden">Next</span>
+          ▶
         </button>
       </div>
     </div>

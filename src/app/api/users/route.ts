@@ -1,42 +1,27 @@
-import connectMongoDB from "../../../../config/mongodb";
-import User from "../../../models/userSchema";
 import { NextResponse } from "next/server";
-import { NextRequest } from "next/server";
+import User from "../../../models/userSchema";  // Adjust the path according to your file structure
 import bcrypt from "bcryptjs";
+import connectMongoDB from "../../../../config/mongodb";  // Adjust the path accordingly
 
-export async function POST(request: NextRequest) {
-  const { username, password } = await request.json();
+
+export const POST = async (request: any) => {
+  const { username, email, password } = await request.json();
+
   await connectMongoDB();
 
+  const hashedPassword = await bcrypt.hash(password, 10);  // Stronger hash
 
-  // Check if the username already exists
-  const existingUser = await User.findOne({ username });
-  if (existingUser) {
-    return NextResponse.json(
-      { message: "Username already taken" },
-      { status: 409 } // Conflict
-    );
-  }
 
-  const hashedPassword = await bcrypt.hash(password,5);
-  const newUser = {
+  const newUser = new User({
     username,
-    password: hashedPassword
-  }
+    password: hashedPassword,
+    email,
+  });
+
   try {
-   await User.create(newUser);
+    await newUser.save();
+    return new NextResponse("User created successfully", { status: 201 });
+  } catch (error) {
+    return new NextResponse("Error creating user", { status: 500 });
   }
-  catch (e:any){
-    return NextResponse.json({message: "Item could not be added"},{status: 401});
-  }
-  finally{
-    return NextResponse.json({ message: "Item added successfully" }, { status: 201 });
-  }
-}
-
-
-export async function GET() {
-    await connectMongoDB();
-    const users = await User.find();
-    return NextResponse.json({ users }, { status: 200 });
-  }
+};
