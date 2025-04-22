@@ -3,12 +3,14 @@ import User from "../../../models/userSchema";  // Adjust the path according to 
 import bcrypt from "bcryptjs";
 import connectMongoDB from "../../../../config/mongodb";  // Adjust the path accordingly
 
+
 export const POST = async (request: any) => {
   const { username, email, password } = await request.json();
 
   await connectMongoDB();
 
   const hashedPassword = await bcrypt.hash(password, 10);  // Stronger hash
+
 
   const newUser = new User({
     username,
