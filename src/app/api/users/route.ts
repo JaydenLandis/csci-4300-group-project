@@ -1,27 +1,30 @@
 import connectMongoDB from "../../../../config/mongodb";
 import User from "../../../models/userSchema";
 import { NextResponse } from "next/server";
-import { NextRequest } from "next/server";
 import bcrypt from "bcryptjs";
 
-export async function POST(request: NextRequest) {
-  const hashedPassword = await bcrypt.hash("password", 10);
-  const { username, password } = await request.json();
+export const POST = async (request: any) => {
+  const {username, password, flashcardSets} = await request.json();
+
+  console.log(username, password, flashcardSets);
+
   await connectMongoDB();
-
-  // Check if the username already exists
-  const existingUser = await User.findOne({ username });
-  if (existingUser) {
-    return NextResponse.json(
-      { message: "Username already taken" },
-      { status: 409 } // Conflict
-    );
+  const hashedPassword = await bcrypt.hash(password, 5);
+  const newUser = {
+    username,
+    password: hashedPassword,
+    flashcardSets: []
   }
-
-  
-
-  const newUser = await User.create({ username, password : hashedPassword });
-  return NextResponse.json({ user: newUser }, { status: 201 });
+  try {
+    await User.create(newUser);
+  } catch (e: any) {
+    return new NextResponse(e.message, {
+      status: 500,
+    });
+  }
+  return new NextResponse("User has been created", {
+    status: 201,
+  });
 }
 
 

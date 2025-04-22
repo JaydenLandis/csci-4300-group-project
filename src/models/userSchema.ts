@@ -1,3 +1,4 @@
+"use server"
 import mongoose, { Schema, Document, Model } from "mongoose";
 import { flashcardSetSchema, IFlashcardSet } from "./flashcardSetSchema";
 import FlashcardSet from "./flashcardSetSchema";

@@ -2,49 +2,52 @@
 
 import Link from "next/link";
 import React from "react";
-import { doCredentialLogin } from "../actions";
-import { useState, FormEvent } from "react";
+import { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
-interface User {
-  username: string;
-  password: string;
-}
-
-const Login = () => {
+const Register = () => {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-
   // Handle form submission (retrieve user object)
-  async function onSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
+  async function handleRegister(e: FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
     try {
+      console.log("Registering user...");
       const formData = new FormData(e.currentTarget);
-      const response = await doCredentialLogin(formData);
 
-      if (response?.error) {
-        console.error(response.error);
-        setError(response.error.message || "An error occurred");
+      const username = formData.get("username") as string | null;
+      const password = formData.get("password") as string | null;
+
+      if (!username || !password) {
+        throw new Error("All fields are required.");
+      }
+      const response = await fetch("http://localhost:3000/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          flashcardSets: [],
+        }),
+      });
+
+      if (response.status === 201) {
+        router.push("/login");
       } else {
-        router.push("/");
+        console.log(`Failed to register: ${response.statusText}`);
       }
     } catch (e: any) {
-      console.error(e);
-      setError("Check your Credentials");
+      console.log(e.message || "An error occurred during registration.");
     }
   }
 
   return (
     <div className="flex flex-col items-center justify-content-center text-center h-100 bg-gray-100 p-5">
-      <h1 className="text-3xl font-bold mb-2">
-        Please enter your Username and Password
-      </h1>
-      <p className="text-3xl mb-3 pb-5">
-        or register if you don't have an account
-      </p>
+      <h1 className="text-3xl font-bold mb-2">Create an Account</h1>
       <form
         className="bg-white p-3 mx-auto rounded shadow-md w-50 rounded border shadow-lg"
-        onSubmit={onSubmit}
+        onSubmit={handleRegister}
       >
         <div className="mb-4">
           <label
@@ -82,18 +85,11 @@ const Login = () => {
           type="submit"
           className="btn btn-primary w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 shadow-sm p-4 mb-5 m-3"
         >
-          Login
+          Register
         </button>
-        <p className="my-3 text-center">
-          Don't you have an account?
-          <Link href="register" className="mx-2 underline">
-            Register
-          </Link>
-        </p>
-        {error && <div className="text-lg text-red-500">{error}</div>}
       </form>
     </div>
   );
 };
 
-export default Login;
+export default Register;

@@ -13,7 +13,7 @@
     "bootstrap": "^5.3.5",
     "mongoose": "^8.13.2",
     "next": "^15.3.0",
-    "next-auth": "^5.0.0-beta.25",
+    "next-auth": "^5.0.0-beta.26",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
