@@ -39,7 +39,7 @@ const Splash: React.FC = () => {
         </p>
         <Link
           href="/login"
-          className="inline-block mt-6 bg-white text-gray-900 font-semibold px-6 py-3 rounded-lg shadow hover:bg-gray-100 transition"
+          className="inline-block mt-6 bg-blue-500 text-white font-semibold px-6 py-3 rounded-lg shadow hover:bg-blue-400 transition"
         >
           Get Started
         </Link>

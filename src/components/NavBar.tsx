@@ -51,20 +51,26 @@ const NavBar = ({ session }: NavbarProps) => {
           </Link>
 
           {isLoggedIn && session?.user ? (
-            <div className="flex items-center gap-4">
-              <span className="text-gray-600">
-                Welcome, {session.user.name || session.user.email}
-              </span>
-              <span className="text-gray-600">
-                <Link href="/cards"> My Cards</Link>
-              </span>
-              <button
-                onClick={handleLogout}
-                className="bg-gray-300 hover:bg-gray-400 text-sm px-4 py-2 rounded-md transition"
+            <>
+              <Link
+                href="/cards"
+                className="text-gray-700 hover:text-black transition mr-10"
               >
-                Logout
-              </button>
-            </div>
+                Cards
+              </Link>
+              <div className="flex items-center gap-4">
+                <span className="text-gray-600">
+                  Welcome, {session.user.name || session.user.email}
+                </span>
+
+                <button
+                  onClick={handleLogout}
+                  className="bg-gray-300 hover:bg-gray-400 text-sm px-4 py-2 rounded-md transition"
+                >
+                  Logout
+                </button>
+              </div>
+            </>
           ) : (
             <div className="text-sm bg-gray-300 rounded-md px-4 py-2">
               <Link href="/login" className="hover:underline">
@@ -122,6 +128,14 @@ const NavBar = ({ session }: NavbarProps) => {
             <div className="flex flex-col gap-2">
               <span className="text-gray-600">
                 Welcome, {session.user.name || session.user.email}
+              </span>
+              <span className="text-gray-600">
+                <Link
+                  href="/cards"
+                  className="text-gray-700 hover:text-black transition mr-10"
+                >
+                  Cards
+                </Link>
               </span>
               <button
                 onClick={handleLogout}
