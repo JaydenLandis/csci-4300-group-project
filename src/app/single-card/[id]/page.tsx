@@ -37,6 +37,31 @@ export default function SingleCardPage() {
     fetchData();
   }, [id]);
 
+  const handleAddCard = () => {
+    if (!flashcardSet) return;
+
+    const newCard: Flashcard = {
+      _id: Math.random().toString(36).substring(2, 9),
+      question: '',
+      answer: '',
+    };
+
+    setFlashcardSet({
+      ...flashcardSet,
+      flashcards: [...flashcardSet.flashcards, newCard],
+    });
+  };
+
+  const handleDeleteCard = (index: number) => {
+    if (!flashcardSet) return;
+
+    const updatedFlashcards = flashcardSet.flashcards.filter((_, i) => i !== index);
+    setFlashcardSet({
+      ...flashcardSet,
+      flashcards: updatedFlashcards,
+    });
+  };
+
   const handleChange = (index: number, field: 'question' | 'answer', value: string) => {
     if (!flashcardSet) return;
 
@@ -51,21 +76,25 @@ export default function SingleCardPage() {
 
   const handleSaveAll = async () => {
     if (!flashcardSet) return;
-
+  
     const res = await fetch(`http://localhost:3000/api/cards/${id}`, {
-      method: 'PUT', // or PATCH depending on your API
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ flashcards: flashcardSet.flashcards }),
     });
-
+  
+    const result = await res.json();
+    console.log('Save result:', result);
+  
     if (!res.ok) {
       alert('Failed to save changes.');
     } else {
       setShowEditor(false);
     }
   };
+  
 
   if (!flashcardSet) return <div>Loading...</div>;
 
@@ -75,7 +104,7 @@ export default function SingleCardPage() {
         flashcards={flashcardSet.flashcards}
         setName={flashcardSet.setName}
       />
-  
+
       <div className="qa-main" style={{ marginTop: '2rem' }}>
         {showEditor ? (
           <>
@@ -94,12 +123,30 @@ export default function SingleCardPage() {
                   onChange={(e) => handleChange(index, 'answer', e.target.value)}
                   placeholder="Edit answer"
                 />
+                <button
+                  className="qa-button-delete"
+                  onClick={() => handleDeleteCard(index)}
+                  style={{ marginLeft: '0.5rem', backgroundColor: '#ff6961', color: 'white' }}
+                >
+                  Delete
+                </button>
               </div>
             ))}
-            <button className="qa-button-save" onClick={handleSaveAll}>Save Changes</button>
+            <button
+              className="qa-button-add"
+              onClick={handleAddCard}
+              style={{ marginTop: '1rem' }}
+            >
+              Add New Card
+            </button>
+            <button className="qa-button-save" onClick={handleSaveAll}>
+              Save Changes
+            </button>
           </>
         ) : (
-          <button className="qa-button-add" onClick={() => setShowEditor(true)}>Edit Flashcards</button>
+          <button className="qa-button-add" onClick={() => setShowEditor(true)}>
+            Edit Flashcards
+          </button>
         )}
       </div>
     </div>
