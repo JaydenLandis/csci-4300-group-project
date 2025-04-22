@@ -15,7 +15,6 @@ interface DemoCard {
 export default function CardsPage() {
   const [demoCards, setDemoCards] = useState<DemoCard[]>([]);
   const [loading, setLoading] = useState(true);
-
   const router = useRouter();
 
   useEffect(() => {
@@ -28,13 +27,9 @@ export default function CardsPage() {
         if (!res.ok) throw new Error("Failed to fetch data");
         const data = await res.json();
 
-        console.log("API returned:", data.cards);
-
-        // Adjust based on what the API returns
         if (Array.isArray(data.cards)) {
           setDemoCards(data.cards);
         } else {
-          console.error("Expected flashcardSets array but got:", data);
           setDemoCards([]);
         }
       } catch (err) {
@@ -56,84 +51,61 @@ export default function CardsPage() {
     })),
   ];
 
-  const chunkArray = <T,>(arr: T[], chunkSize: number): T[][] => {
-    const chunks: T[][] = [];
-    for (let i = 0; i < arr.length; i += chunkSize) {
-      chunks.push(arr.slice(i, i + chunkSize));
-    }
-    return chunks;
-  };
-
-  const rows = chunkArray(cards, 3);
-
   if (loading)
     return (
-      <div className="container d-flex justify-content-center pt-5 pb-5">
-        <h1>Loading...</h1>
+      <div className="flex justify-center items-center h-screen">
+        <h1 className="text-xl font-semibold">Loading...</h1>
       </div>
     );
 
   return (
-    <div className="container mt-4">
-      {rows.map((row, rowIndex) => (
-        <div className="row mb-4" key={rowIndex}>
-          {row.map((card, cardIndex) => (
-            <div className="col-md-4" key={cardIndex}>
-              {card.type === "add" ? (
-                <Link href="/new-card" className="text-decoration-none">
-                  <div
-                    className="card text-center h-100"
-                    style={{ minHeight: "350px" }}
-                  >
-                    <div className="card-body d-flex flex-column justify-content-center">
-                      <h5 className="card-title">Add Card</h5>
-                      <p className="card-text">Click here to add a new card</p>
+    <div className="p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {cards.map((card, index) => (
+          <div key={index} className="w-full">
+            {card.type === "add" ? (
+              <Link href="/new-card">
+                <div className="rounded-xl border border-gray-300 hover:shadow-lg transition bg-white min-h-[350px] flex flex-col p-4">
+                  <div className="flex flex-col justify-between flex-grow h-full">
+                    <div className="flex-grow flex flex-col justify-center items-center text-center">
+                      <h5 className="text-lg font-semibold">Add Card</h5>
+                      <p className="text-gray-600 mt-2">
+                        Click here to add a new card
+                      </p>
                     </div>
                   </div>
-                </Link>
-              ) : (
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      console.log(
-                        "Flash me",
-                        router.push(`/single-card/${(card as DemoCard)._id}`)
-                      );
-                    }}
-                    className="btn btn-light w-100 h-100 p-0 border-0"
-                    style={{ background: "none", border: "none", padding: 0 }}
-                  >
-                    <div
-                      className="card text-center h-100"
-                      style={{ minHeight: "350px" }}
-                    >
-                      <Image
-                        src={
-                          (card as DemoCard).imgUrl || "/assets/flashcards.jpg"
-                        }
-                        alt={(card as DemoCard).setName}
-                        width={400} // Adjust as needed
-                        height={250}
-                        className="card-img-top"
-                        style={{ objectFit: "cover" }}
-                      />
-                      <div className="card-body">
-                        <h5 className="card-title">
-                          {(card as DemoCard).setName}
-                        </h5>
-                        <p className="card-text">
-                          {(card as DemoCard).flashcards.length} cards
-                        </p>
-                      </div>
-                    </div>
-                  </button>
                 </div>
-              )}
-            </div>
-          ))}
-        </div>
-      ))}
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() =>
+                  router.push(`/single-card/${(card as DemoCard)._id}`)
+                }
+                className="w-full text-left"
+              >
+                <div className="rounded-xl border border-gray-300 hover:shadow-lg transition bg-white min-h-[350px] overflow-hidden flex flex-col">
+                  <Image
+                    src={(card as DemoCard).imgUrl || "/assets/flashcards.jpg"}
+                    alt={(card as DemoCard).setName}
+                    width={400}
+                    height={250}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-4">
+                    <h5 className="text-lg font-semibold">
+                      {(card as DemoCard).setName}
+                    </h5>
+                    <p className="text-gray-600">
+                      {(card as DemoCard).flashcards.length} cards
+                    </p>
+                  </div>
+                </div>
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
