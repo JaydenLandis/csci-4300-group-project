@@ -8,12 +8,12 @@ export async function doLogout() {
 
 export async function doCredentialLogin(formData: FormData): Promise<any> {
   
-  const username = formData.get("username") as string; 
+  const email = formData.get("email") as string; 
   const password = formData.get("password") as string; 
 
   try {
     const response = await signIn("credentials", {
-        username,
+        email,
         password,
         redirect: false,
       });

@@ -10,18 +10,18 @@ export const {
     signIn,
     signOut,
 } = NextAuth({
-  ...authConfig,
+    ...authConfig,
   providers: [
     CredentialsProvider({
       credentials: {
-        username: {},
+        email: {},
         password: {},
       },
       async authorize(credentials) {
         if (!credentials) return null;
 
         try {
-          const user = await User.findOne({ username: credentials.username }).lean();
+          const user = await User.findOne({ email: credentials.email }).lean();
 
           if (user) {
             const isMatch = await bcrypt.compare(
@@ -32,15 +32,16 @@ export const {
             if (isMatch) {
               return {
                 id: user._id.toString(),
+                email: user.email,
                 name: user.username,
               };
             } else {
-              console.log("Username or Password is not correct");
+              console.log("Email or Password is not correct");
               return null;
             }
           } else {
-            console.log("User not found");
-            return null;
+             console.log("User not found");
+             return null;
           }
         } catch (error: any) {
           console.log("An error occurred: ", error);

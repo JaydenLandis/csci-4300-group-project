@@ -1,12 +1,12 @@
-"use client";
+"use server";
 
 import React from "react";
 
-const Footer: React.FC = () => {
+const Footer: React.FC = async () => {
   return (
-    <footer className="bg-light text-center text-lg-start mt-auto py-3 border-top">
-      <div className="container text-center">
-        <span className="text-muted">
+    <footer className="bg-gray-100 text-center text-sm text-gray-500 py-4 border-t mt-auto">
+      <div className="container mx-auto px-4">
+        <span>
           © {new Date().getFullYear()} AutoFlash. All rights reserved.
         </span>
       </div>

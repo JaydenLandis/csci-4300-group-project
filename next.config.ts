@@ -13,6 +13,16 @@ const nextConfig: NextConfig = {
         hostname: 'images.unsplash.com',
         pathname: '/**', // This allows all paths under the domain
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.britannica.com',
+        pathname: '/**', // This allows all paths under the domain
+      },
+      {
+        protocol: 'https',
+        hostname: '**',
+        pathname: '**',
+      }
     ],
   },
 };

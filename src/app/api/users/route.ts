@@ -1,35 +1,25 @@
-import connectMongoDB from "../../../../config/mongodb";
-import User from "../../../models/userSchema";
 import { NextResponse } from "next/server";
+import User from "../../../models/userSchema";  // Adjust the path according to your file structure
 import bcrypt from "bcryptjs";
+import connectMongoDB from "../../../../config/mongodb";  // Adjust the path accordingly
 
 export const POST = async (request: any) => {
-  const {username, password, flashcardSets} = await request.json();
-
-  console.log(username, password, flashcardSets);
+  const { username, email, password } = await request.json();
 
   await connectMongoDB();
-  const hashedPassword = await bcrypt.hash(password, 5);
-  const newUser = {
+
+  const hashedPassword = await bcrypt.hash(password, 10);  // Stronger hash
+
+  const newUser = new User({
     username,
     password: hashedPassword,
-    flashcardSets: []
-  }
-  try {
-    await User.create(newUser);
-  } catch (e: any) {
-    return new NextResponse(e.message, {
-      status: 500,
-    });
-  }
-  return new NextResponse("User has been created", {
-    status: 201,
+    email,
   });
-}
 
-
-export async function GET() {
-    await connectMongoDB();
-    const users = await User.find();
-    return NextResponse.json({ users }, { status: 200 });
+  try {
+    await newUser.save();
+    return new NextResponse("User created successfully", { status: 201 });
+  } catch (error) {
+    return new NextResponse("Error creating user", { status: 500 });
   }
+};

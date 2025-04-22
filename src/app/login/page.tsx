@@ -1,25 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import React from "react";
-import { doCredentialLogin } from "../actions";
-import { useState, FormEvent } from "react";
+import React, { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { doCredentialLogin } from "../actions";
 
-interface User {
-  username: string;
-  password: string;
-}
-
-const Login = () => {
+const LoginForm = () => {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string>("");
 
-  // Handle form submission (retrieve user object)
-  async function onSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
-    e.preventDefault();
+  async function onSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
+    event.preventDefault();
+
     try {
-      const formData = new FormData(e.currentTarget);
+      const formData = new FormData(event.currentTarget);
       const response = await doCredentialLogin(formData);
 
       if (response?.error) {
@@ -35,65 +29,68 @@ const Login = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-content-center text-center h-100 bg-gray-100 p-5">
-      <h1 className="text-3xl font-bold mb-2">
-        Please enter your Username and Password
-      </h1>
-      <p className="text-3xl mb-3 pb-5">
-        or register if you don't have an account
-      </p>
-      <form
-        className="bg-white p-3 mx-auto rounded shadow-md w-50 rounded border shadow-lg"
-        onSubmit={onSubmit}
-      >
-        <div className="mb-4">
-          <label
-            htmlFor="username"
-            className="block text-sm font-medium text-gray-700 m-3"
+    <div className="flex justify-center items-center min-h-screen bg-gray-50">
+      <div className="w-full max-w-md bg-white border border-gray-200 rounded-lg shadow-md p-8">
+        <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
+
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={onSubmit} className="space-y-5">
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Email Address
+            </label>
+            <input
+              className="w-full border border-gray-300 px-4 py-3 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              type="email"
+              name="email"
+              id="email"
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Password
+            </label>
+            <input
+              className="w-full border border-gray-300 px-4 py-3 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              type="password"
+              name="password"
+              id="password"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-md font-semibold transition"
           >
-            Username
-          </label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            placeholder="Enter your username"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium text-gray-700 margin-50 m-3"
-          >
-            Password
-          </label>
-          <input
-            placeholder="Enter your password"
-            name="password"
-            type="password"
-            id="password"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500"
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          className="btn btn-primary w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 shadow-sm p-4 mb-5 m-3"
-        >
-          Login
-        </button>
-        <p className="my-3 text-center">
-          Don't you have an account?
-          <Link href="register" className="mx-2 underline">
-            Register
+            Login
+          </button>
+        </form>
+
+        <p className="mt-6 text-sm text-center text-gray-600">
+          Don’t have an account?
+          <Link href="/register" className="text-blue-600 hover:underline ml-1">
+            Sign up
           </Link>
         </p>
-        {error && <div className="text-lg text-red-500">{error}</div>}
-      </form>
+      </div>
     </div>
   );
 };
 
-export default Login;
+export default LoginForm;
