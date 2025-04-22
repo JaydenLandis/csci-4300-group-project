@@ -110,7 +110,7 @@ export default function CardsPage() {
                   >
                     <Image
                       src={
-                        (card as DemoCard).imgUrl || "/assets/flashcards.jpg"
+                         "/assets/flashcards.jpg"
                       }
                       alt={(card as DemoCard).setName}
                       width={400} // Adjust as needed
