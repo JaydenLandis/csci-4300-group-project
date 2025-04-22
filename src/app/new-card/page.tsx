@@ -25,11 +25,14 @@ const QuestionAnswerForm: React.FC = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  /*
+  Adds a new flashcard to the list and validates data
+  */
   const addCard = useCallback(() => {
-    if (!question.trim() || !answer.trim()) return;
+    if (!question || !answer) return;
     setCards(prev => [
       ...prev,
-      { question: question.trim(), answer: answer.trim() },
+      { question: question, answer: answer },
     ]);
     setQuestion('');
     setAnswer('');
@@ -41,6 +44,7 @@ const QuestionAnswerForm: React.FC = () => {
 
 
   /*
+  Function for sending files or text to the API.
   */
   const handleUpload = useCallback(
     async ({
@@ -103,11 +107,11 @@ const QuestionAnswerForm: React.FC = () => {
   // Handles the text upload process and ensures text is provided 
   const uploadText = useCallback(() => {
     handleUpload({
-      precondition: paragraphText.trim().length > 0,
+      precondition: paragraphText.length > 0,
       preconditionMsg: 'Please enter some text first.',
       buildFormData: () => {
         const fd = new FormData();
-        fd.append('text', paragraphText.trim());
+        fd.append('text', paragraphText);
         return fd;
       },
       url: '/api/text',
@@ -119,14 +123,30 @@ const QuestionAnswerForm: React.FC = () => {
     });
   }, [paragraphText, handleUpload]);
 
+  // Validate the url
+  const isValidUrl = (url: string): boolean => {
+    try {
+      new URL(url)
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // Save the set and check for valid URL, at least 1 card, and set name
   const saveSet = useCallback(async () => {
-    if (!setName.trim() || cards.length === 0) {
+    if (!setName || cards.length === 0) {
       alert('Please provide a set name and at least one card.');
       return;
     }
+    if (!coverImageUrl || !isValidUrl(coverImageUrl)) {
+      alert('Please provide a valid cover image URL');
+      return;
+    }
+
     const payload = {
-      setName: setName.trim(),
-      imgUrl: coverImageUrl.trim(),
+      setName: setName,
+      imgUrl: coverImageUrl,
       flashcards: cards,
     };
     try {

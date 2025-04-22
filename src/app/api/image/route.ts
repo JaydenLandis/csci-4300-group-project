@@ -67,6 +67,5 @@ ${combinedText}
     );
   }
 
-  // return flashcards array
   return NextResponse.json({ flashcards }, { status: 200 });
 }
