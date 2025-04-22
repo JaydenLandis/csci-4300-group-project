@@ -1,13 +1,23 @@
 "use client";
 
-import React, { useState, useRef, useCallback } from 'react';
-import '@/components/NewCard.css';
 
-type Card = { question: string; answer: string };
+//import Image from "next/image";
+import React, { useState, useRef, useCallback } from "react";
+import { useEffect } from "react";
+import "@/components/NewCard.css";
+import "./newcard.css";
+
+type Card = {
+  question: string;
+  answer: string;
+};
+
+
 type UploadStatus = 'idle' | 'uploading' | 'success' | 'error';
 
 /*
 Component for creating a new flashcard set.
+
 
 It allows for image/text uplaod to generate flashcards
 */

@@ -1,0 +1,151 @@
+/* General container for the entire form */
+.qa-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding-left: 2rem;
+}
+  
+.qa-title {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    color: #333;
+    margin-bottom: 1rem;
+}
+  
+.qa-description {
+    text-align: center;
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 1.5rem;
+}
+  
+.qa-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+  
+.qa-label {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+  
+.qa-set-name,
+.qa-question,
+.qa-answer, 
+.qa-url {
+    padding: 0.8rem;
+    font-size: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+    width: 95%;
+}
+  
+.qa-set-name:focus,
+.qa-question:focus,
+.qa-answer:focus {
+    border-color: #007bff;
+}
+  
+.qa-button,
+.qa-confirm-button {
+    padding: 0.8rem;
+    font-size: 1.1rem;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem;
+    width: 100%;
+}
+  
+.qa-button:hover,
+.qa-confirm-button:hover {
+    background-color: #0056b3;
+}
+  
+.qa-delete-button {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    color: #fff;
+    background-color: #dc3545;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+  
+.qa-delete-button:hover {
+    background-color: #c82333;
+}
+
+.qa-card-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 2rem;
+}
+  
+.qa-card {
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+}
+  
+.qa-card p {
+    font-size: 1rem;
+    color: #333;
+}
+  
+.qa-card strong {
+    font-weight: bold;
+}
+  
+.qa-card + .qa-card {
+    margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+    .qa-container {
+      padding: 1.5rem;
+      margin: 1.5rem;
+    }
+  
+    .qa-title {
+      font-size: 1.8rem;
+    }
+  
+    .qa-description {
+      font-size: 0.9rem;
+    }
+  
+    .qa-set-name,
+    .qa-question,
+    .qa-answer {
+      font-size: 0.95rem;
+    }
+  
+    .qa-button,
+    .qa-confirm-button {
+      padding: 0.7rem;
+      font-size: 1rem;
+    }
+  
+    .qa-delete-button {
+      padding: 0.5rem 0.8rem;
+      font-size: 0.85rem;
+    }
+}
+  
