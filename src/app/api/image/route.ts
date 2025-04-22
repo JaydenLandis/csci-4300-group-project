@@ -1,31 +1,69 @@
+// src/app/api/flashcards/generate/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
-import {
-  extractTextFromImages,
-  handleFlashcards,
-} from '../../../../services/flashcards';
+import { GoogleGenAI, createUserContent } from '@google/genai';
+import { extractTextFromImages } from '../../../../services/flashcards';
 
 export async function POST(request: NextRequest) {
   const apiKey = process.env.GEN_AI_API_KEY;
   if (!apiKey) {
-    return NextResponse.json({ error: 'Missing GEN_AI_API_KEY' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Missing GEN_AI_API_KEY' },
+      { status: 500 }
+    );
   }
   const ai = new GoogleGenAI({ apiKey });
 
-  // parse inputs
+  // parse image files
   const form = await request.formData();
-  const setId = form.get('setId');
   const imageFiles = form.getAll('images') as File[];
-  if (typeof setId !== 'string' || imageFiles.length === 0) {
+  if (imageFiles.length === 0) {
     return NextResponse.json(
-      { error: 'Please include setId and at least one image.' },
+      { error: 'Please include at least one image under the `images` field.' },
       { status: 400 }
     );
   }
 
-  // Extract text from image
+  // extract text from each image
   const combinedText = await extractTextFromImages(ai, imageFiles);
 
-  // generate & save flashcards
-  return handleFlashcards(ai, setId, combinedText);
+  // prompt for flashcards
+  const prompt = `
+Return ONLY a JSON array like:
+  [{ "question": "…", "answer": "…" }]
+
+Be sure to include only the most important topics,
+and format exactly as JSON.
+
+Text:
+${combinedText}
+  `
+
+  // generate flashcards
+  const flashRes = await ai.models.generateContent({
+    model: 'gemini-2.0-flash',
+    contents: createUserContent([prompt]),
+  });
+
+  // parse
+  const raw = flashRes.text ?? '';
+  const jsonText = raw
+    .replace(/^```(?:json)?\s*/, '')
+    .replace(/```$/, '')
+    .trim();
+
+  let flashcards: { question: string; answer: string }[];
+  try {
+    flashcards = JSON.parse(jsonText);
+  } catch (err) {
+    return NextResponse.json(
+      {
+        error: 'Failed to parse JSON from AI response.',
+        raw,
+      },
+      { status: 502 }
+    );
+  }
+
+  // return flashcards array
+  return NextResponse.json({ flashcards }, { status: 200 });
 }
