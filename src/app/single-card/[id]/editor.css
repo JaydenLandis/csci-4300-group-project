@@ -6,53 +6,53 @@
     font-family: sans-serif;
     max-width: 960px;
     margin: 0 auto;
-  }
+}
   
-  .qa-main {
+.qa-main {
     background: #fff;
     padding: 1rem;
     border-radius: 8px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     margin-top: 1rem;
-  }
+}
   
-  .qa-main h2 {
+.qa-main h2 {
     margin-bottom: 0.5rem;
     color: #333;
     text-align: center;
-  }
+}
   
-  .qa-editor-title {
+.qa-editor-title {
     color: #0070f3;
     font-size: 1.5rem;
     font-weight: 600;
     margin-bottom: 1rem;
     text-align: center;
-  }
+}
   
-  .qa-input-group {
+.qa-input-group {
     display: flex;
-    gap: 2rem; /* Adjust the space between the input fields */
+    gap: 2rem; 
     margin-bottom: 1.5rem;
-  }
+}
   
-  .qa-input {
-    flex: 1; /* Ensure the input fields take equal width */
+.qa-input {
+    flex: 1; 
     padding: 0.75rem;
     border-radius: 6px;
     border: 1px solid #ccc;
     background-color: #f9f9f9;
     font-size: 1rem;
     transition: border-color 0.3s;
-  }
+}
   
-  .qa-input:focus {
+.qa-input:focus {
     border-color: #0070f3;
     outline: none;
-  }
+}
   
-  .qa-button-add,
-  .qa-button-save {
+.qa-button-add,
+.qa-button-save {
     width: 100%;
     padding: 1rem;
     border-radius: 6px;
@@ -62,18 +62,18 @@
     font-size: 1.1rem;
     cursor: pointer;
     transition: background-color 0.3s;
-  }
+}
   
-  .qa-button-add:hover,
-  .qa-button-save:hover {
+.qa-button-add:hover,
+.qa-button-save:hover {
     background-color: #005bb5;
-  }
+}
   
-  .qa-button-save {
+.qa-button-save {
     background-color: #28a745;
-  }
+}
   
-  .qa-button-save:hover {
+.qa-button-save:hover {
     background-color: #218838;
-  }
+}
   

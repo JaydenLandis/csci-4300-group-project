@@ -4,6 +4,7 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import "@/components/NewCard.css";
+import "./newcard.css";
 
 type Card = {
   question: string;

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import './cardPage.css'
 
 interface DemoCard {
   _id: string;
@@ -73,67 +74,62 @@ export default function CardsPage() {
       </div>
     );
 
-  return (
-    <div className="container mt-4">
-      {rows.map((row, rowIndex) => (
-        <div className="row mb-4" key={rowIndex}>
-          {row.map((card, cardIndex) => (
-            <div className="col-md-4" key={cardIndex}>
-              {card.type === "add" ? (
-                <Link href="/new-card" className="text-decoration-none">
-                  <div
-                    className="card text-center h-100"
-                    style={{ minHeight: "350px" }}
-                  >
-                    <div className="card-body d-flex flex-column justify-content-center">
-                      <h5 className="card-title">Add Card</h5>
-                      <p className="card-text">Click here to add a new card</p>
-                    </div>
-                  </div>
-                </Link>
-              ) : (
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      console.log(
-                        "Flash me",
-                        router.push(`/single-card/${(card as DemoCard)._id}`)
-                      );
-                    }}
-                    className="btn btn-light w-100 h-100 p-0 border-0"
-                    style={{ background: "none", border: "none", padding: 0 }}
-                  >
-                    <div
-                      className="card text-center h-100"
-                      style={{ minHeight: "350px" }}
-                    >
-                      <Image
-                        src={
-                          (card as DemoCard).imgUrl || "/assets/flashcards.jpg"
-                        }
-                        alt={(card as DemoCard).setName}
-                        width={400} // Adjust as needed
-                        height={250}
-                        className="card-img-top"
-                        style={{ objectFit: "cover" }}
-                      />
-                      <div className="card-body">
-                        <h5 className="card-title">
-                          {(card as DemoCard).setName}
-                        </h5>
-                        <p className="card-text">
-                          {(card as DemoCard).flashcards.length} cards
-                        </p>
+    return (
+      <div className="custom-container">
+        {rows.map((row, rowIndex) => (
+          <div className="custom-row" key={rowIndex}>
+            {row.map((card, cardIndex) => (
+              <div className="card-column" key={cardIndex}>
+                {card.type === "add" ? (
+                  <Link href="/new-card" className="text-decoration-none">
+                    <div className="add-card-container">
+                      <div className="card">
+                        <div className="card-body">
+                          <h5 className="card-title">Add New Set</h5>
+                          <p className="card-text">Click here to add a new set</p>
+                        </div>
                       </div>
                     </div>
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      ))}
-    </div>
-  );
-}
+                  </Link>
+                ) : (
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        console.log(
+                          "Flash me",
+                          router.push(`/single-card/${(card as DemoCard)._id}`)
+                        );
+                      }}
+                      className="card-button"
+                    >
+                      <div className="custom-card">
+                        <Image
+                          src={
+                            (card as DemoCard).imgUrl || "/assets/flashcards.jpg"
+                          }
+                          alt={(card as DemoCard).setName}
+                          width={400} // Adjust as needed
+                          height={250}
+                          className="card-img-top"
+                          style={{ objectFit: "cover" }}
+                        />
+                        <div className="card-body">
+                          <h5 className="card-title">
+                            {(card as DemoCard).setName}
+                          </h5>
+                          <p className="card-text">
+                            {(card as DemoCard).flashcards.length} cards
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    );
+  }    
