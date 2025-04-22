@@ -40,8 +40,9 @@ export default function SingleCardPage() {
   const handleAddCard = () => {
     if (!flashcardSet) return;
 
+    const randomHexId = [...Array(24)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
     const newCard: Flashcard = {
-      _id: Math.random().toString(36).substring(2, 9),
+      _id: randomHexId,
       question: '',
       answer: '',
     };
@@ -152,3 +153,5 @@ export default function SingleCardPage() {
     </div>
   );
 }
+
+
