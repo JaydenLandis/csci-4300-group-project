@@ -6,8 +6,19 @@ import connectMongoDB from "../../../../config/mongodb";  // Adjust the path acc
 
 export const POST = async (request: any) => {
   const { username, email, password } = await request.json();
+  if (!username || !email || !password) {
+    return new NextResponse("Missing required fields", { status: 400 });
+  }
 
   await connectMongoDB();
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return new NextResponse("User already exists", { status: 409 });
+  }
+
+  
+
+  
 
   const hashedPassword = await bcrypt.hash(password, 10);  // Stronger hash
 
@@ -22,6 +33,8 @@ export const POST = async (request: any) => {
     await newUser.save();
     return new NextResponse("User created successfully", { status: 201 });
   } catch (error) {
-    return new NextResponse("Error creating user", { status: 500 });
+    console.error("Registration error:", error);  // Don't expose in prod
+    return new NextResponse("Server error while creating user", { status: 500 });
   }
+  
 };
