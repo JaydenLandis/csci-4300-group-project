@@ -4,13 +4,15 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import './cardPage.css'
+import { getClientUsername } from "../../../services/clientInfo";
+import "./cardPage.css";
 
 interface DemoCard {
   _id: string;
   setName: string;
   imgUrl: string;
   flashcards: { question: string; answer: string }[];
+  owner: string;
 }
 
 export default function CardsPage() {
@@ -100,6 +102,9 @@ export default function CardsPage() {
                     <p className="text-gray-600">
                       {(card as DemoCard).flashcards.length} cards
                     </p>
+                    <h5 className="text-sm font-semibold mt-2">
+                      Owner: {(card as DemoCard).owner || "Anonymous"}
+                    </h5>
                   </div>
                 </div>
               </button>
