@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import SingleCardClient from "@/components/SingleCardClient";
 import { belongsToClient } from "../../../../services/clientInfo";
+import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
 import "./editor.css";
 
@@ -19,6 +20,7 @@ interface FlashcardSet {
 }
 
 export default function SingleCardPage() {
+  const router = useRouter();
   const { id } = useParams();
   const [flashcardSet, setFlashcardSet] = useState<FlashcardSet | null>(null);
   const [showEditor, setShowEditor] = useState(false);
@@ -70,11 +72,13 @@ export default function SingleCardPage() {
   const handleAddCard = () => {
     if (!flashcardSet) return;
 
-    const randomHexId = [...Array(24)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+    const randomHexId = [...Array(24)]
+      .map(() => Math.floor(Math.random() * 16).toString(16))
+      .join("");
     const newCard: Flashcard = {
       _id: randomHexId,
-      question: '',
-      answer: '',
+      question: "",
+      answer: "",
     };
 
     setFlashcardSet({
@@ -86,36 +90,47 @@ export default function SingleCardPage() {
   const handleDeleteCard = (index: number) => {
     if (!flashcardSet) return;
 
-    const updatedFlashcards = flashcardSet.flashcards.filter((_, i) => i !== index);
+    const updatedFlashcards = flashcardSet.flashcards.filter(
+      (_, i) => i !== index
+    );
     setFlashcardSet({
       ...flashcardSet,
       flashcards: updatedFlashcards,
     });
   };
 
-    
-
   const handleSaveAll = async () => {
     if (!flashcardSet) return;
-  
+
     const res = await fetch(`http://localhost:3000/api/cards/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ flashcards: flashcardSet.flashcards }),
     });
-  
+
     const result = await res.json();
-    console.log('Save result:', result);
-  
+    console.log("Save result:", result);
+
     if (!res.ok) {
       alert("Failed to save changes.");
     } else {
       setShowEditor(false);
     }
   };
-  
+
+  const handleDeleteSet = async () => {
+    const res = await fetch(`http://localhost:3000/api/cards/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      alert("Failed to delete flashcard set.");
+    } else {
+      router.push("/cards");
+    }
+  };
 
   if (!flashcardSet) return <div>Loading...</div>;
 
@@ -149,18 +164,17 @@ export default function SingleCardPage() {
                   placeholder="Edit answer"
                 />
                 <button
-                  className="qa-button-delete"
                   onClick={() => handleDeleteCard(index)}
-                  style={{ marginLeft: '0.5rem', backgroundColor: '#ff6961', color: 'white' }}
+                  className="ml-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded-md shadow-sm transition-all duration-200 ease-in-out hover:shadow-md active:scale-95"
                 >
                   Delete
                 </button>
               </div>
             ))}
             <button
-              className="qa-button-add"
+              className="qa-button-add my-4"
               onClick={handleAddCard}
-              style={{ marginTop: '1rem' }}
+              style={{ marginTop: "1rem" }}
             >
               Add New Card
             </button>
@@ -170,17 +184,23 @@ export default function SingleCardPage() {
           </>
         ) : (
           isOwner && (
-            <button
-              className="qa-button-add"
-              onClick={() => setShowEditor(!showEditor)}
-            >
-              Edit Flashcards
-            </button>
+            <>
+              <button
+                className="qa-button-add my-4"
+                onClick={() => setShowEditor(!showEditor)}
+              >
+                Edit Flashcards
+              </button>
+              <button
+                className="w-full ml-2 bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-bold py-2 px-5 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out tracking-wider uppercase active:scale-95 my-4"
+                onClick={handleDeleteSet}
+              >
+                Delete Set
+              </button>
+            </>
           )
         )}
       </div>
     </div>
   );
 }
-
-

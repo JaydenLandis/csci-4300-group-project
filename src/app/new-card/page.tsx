@@ -3,6 +3,7 @@
 //import Image from "next/image";
 import React, { useState, useRef, useCallback } from "react";
 import { getClientUsername } from "../../../services/clientInfo";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import "@/components/NewCard.css";
 import "./newcard.css";
@@ -21,6 +22,7 @@ Component for creating a new flashcard set.
 It allows for image/text uplaod to generate flashcards
 */
 const QuestionAnswerForm: React.FC = () => {
+  const router = useRouter();
   const [setName, setSetName] = useState("");
   const [coverImageUrl, setCoverImageUrl] = useState("");
   const [question, setQuestion] = useState("");
@@ -181,6 +183,7 @@ const QuestionAnswerForm: React.FC = () => {
       setParagraphText("");
       setImageUploadStatus("idle");
       setTextUploadStatus("idle");
+      router.push("/cards");
     } catch (error) {
       console.error(error);
       alert("Failed to save. Try again.");
