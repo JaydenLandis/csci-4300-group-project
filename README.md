@@ -1,5 +1,11 @@
 # AutoFlash
 
+**Group Members**
+- Jackson Barlow — Database / Project Leader  
+- Jayden Landis — GitHub Manager, API Implementation  
+- Sam Pinho — Communications Leader, Back-End Implementation  
+- Adrian Morales — Miro Board Manager, Front-End Implementation  
+
 AutoFlash is a Next.js application that creates and simulates flashcard sets for UGA students to study for any subject of their choice. Whether you want to build your own set from scratch or let AI do the work, AutoFlash has you covered.
 
 ## Features
