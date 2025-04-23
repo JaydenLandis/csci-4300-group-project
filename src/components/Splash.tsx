@@ -6,8 +6,8 @@ import Link from "next/link";
 
 const images = [
   "/assets/flashcards.jpg",
-  "/assets/flashcards.jpg",
-  "/assets/flashcards.jpg",
+  "/assets/Sample1.jpeg",
+  "/assets/Sample2.jpeg",
 ];
 
 const Splash: React.FC = () => {
