@@ -24,6 +24,8 @@ export const config = {
         "/cards",
         "/new-card",
         "/cards/*",
+        "/single-card/*",
+        "/single-card",
     ],
 };
 
