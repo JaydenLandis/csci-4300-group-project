@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./single-card.css"; // or import specific flip styles
 
 interface FlipCardProps {
@@ -10,6 +10,9 @@ interface FlipCardProps {
 
 export default function FlipCard({ front, back }: FlipCardProps) {
   const [flipped, setFlipped] = useState(false);
+  useEffect(() => {
+    setFlipped(false);
+  }, [front, back]);
 
   return (
     <div

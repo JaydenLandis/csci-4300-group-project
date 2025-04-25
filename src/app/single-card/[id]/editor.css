@@ -77,3 +77,31 @@
     background-color: #218838;
 }
   
+.qa-button-small {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .qa-button-small.edit {
+    background-color: #0070f3;
+    color: white;
+  }
+  
+  .qa-button-small.edit:hover {
+    background-color: #005bb5;
+  }
+  
+  .qa-button-small.delete {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .qa-button-small.delete:hover {
+    background-color: #bd2130;
+  }
+  
