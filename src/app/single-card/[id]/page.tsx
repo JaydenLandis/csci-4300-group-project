@@ -184,20 +184,20 @@ export default function SingleCardPage() {
           </>
         ) : (
           isOwner && (
-            <>
+            <div className="flex flex-col items-center gap-6 mt-6">
               <button
-                className="qa-button-add my-4"
                 onClick={() => setShowEditor(!showEditor)}
+                className="qa-button-small edit"
               >
                 Edit Flashcards
               </button>
               <button
-                className="w-full ml-2 bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-bold py-2 px-5 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out tracking-wider uppercase active:scale-95 my-4"
                 onClick={handleDeleteSet}
+                className="qa-button-small delete"
               >
                 Delete Set
               </button>
-            </>
+            </div>
           )
         )}
       </div>
