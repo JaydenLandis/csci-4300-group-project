@@ -18,6 +18,7 @@ interface DemoCard {
 export default function CardsPage() {
   const [demoCards, setDemoCards] = useState<DemoCard[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -46,9 +47,17 @@ export default function CardsPage() {
     fetchCards();
   }, []);
 
+  const filteredCards = demoCards.filter((card) => {
+    const lowerSearch = searchQuery.toLowerCase();
+    return (
+      (card.setName?.toLowerCase().includes(lowerSearch) ?? false) ||
+      (card.owner?.toLowerCase().includes(lowerSearch) ?? false)
+    );
+  });
+
   const cards = [
     { type: "add" },
-    ...demoCards.map((card) => ({
+    ...filteredCards.map((card) => ({
       ...card,
       type: "demo" as const,
     })),
@@ -63,12 +72,20 @@ export default function CardsPage() {
 
   return (
     <div className="p-4">
+      <input
+        type="text"
+        placeholder="Search by name or username..."
+        className="mb-6 w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {cards.map((card, index) => (
           <div key={index} className="w-full">
             {card.type === "add" ? (
               <Link href="/new-card">
-                <div className="rounded-xl border border-gray-300 hover:shadow-lg transition bg-white min-h-[350px] flex flex-col p-4">
+                <div className="rounded-xl border border-gray-300 hover:shadow-lg transition bg-white h-[280px] flex flex-col p-4">
                   <div className="flex flex-col justify-between flex-grow h-full">
                     <div className="flex-grow flex flex-col justify-center items-center text-center">
                       <h5 className="text-lg font-semibold">Add Card</h5>
@@ -87,22 +104,22 @@ export default function CardsPage() {
                 }
                 className="w-full text-left"
               >
-                <div className="rounded-xl border border-gray-300 hover:shadow-lg transition bg-white min-h-[350px] overflow-hidden flex flex-col">
+                <div className="rounded-xl border border-gray-300 hover:shadow-lg transition bg-white h-[280px] overflow-hidden flex flex-col">
                   <Image
                     src={(card as DemoCard).imgUrl || "/assets/flashcards.jpg"}
                     alt={(card as DemoCard).setName}
                     width={400}
-                    height={250}
-                    className="w-full h-48 object-cover"
+                    height={200}
+                    className="w-full h-36 object-cover"
                   />
-                  <div className="p-4">
-                    <h5 className="text-lg font-semibold">
+                  <div className="p-3">
+                    <h5 className="text-base font-semibold">
                       {(card as DemoCard).setName}
                     </h5>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 text-sm">
                       {(card as DemoCard).flashcards.length} cards
                     </p>
-                    <h5 className="text-sm font-semibold mt-2">
+                    <h5 className="text-xs font-medium mt-2">
                       Owner: {(card as DemoCard).owner || "Anonymous"}
                     </h5>
                   </div>
